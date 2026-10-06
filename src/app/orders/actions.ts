@@ -9,6 +9,7 @@ import { hasEmailEnv, sendEmail } from "@/lib/email/send";
 import { paymentClaimedAlertEmail } from "@/lib/email/templates";
 import { isUuid } from "@/lib/timetable";
 import { orderNo } from "@/lib/orders";
+import { one, type Rel } from "@/lib/rel";
 
 export type ClaimState = { error?: string } | undefined;
 
@@ -46,13 +47,14 @@ export async function claimPayment(_prev: ClaimState, formData: FormData): Promi
   const notifyTo = process.env.NOTIFICATIONS_RECIPIENT ?? process.env.ADMIN_NOTIFY_EMAIL;
   if (notifyTo && hasEmailEnv) {
     try {
-      const { data: o } = await supabase.from("orders").select("order_no, amount_kes, plans(name)").eq("id", id).maybeSingle();
+      const { data: raw } = await supabase.from("orders").select("order_no, amount_kes, plans(name)").eq("id", id).maybeSingle();
+      const o = raw as unknown as { order_no: number; amount_kes: number; plans: Rel<{ name: string }> } | null;
       if (o) {
         const h = await headers();
         const origin = h.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
         const mail = paymentClaimedAlertEmail({
           memberName: profile.fullName || profile.email || "A member",
-          planName: o.plans?.name ?? "membership",
+          planName: one(o.plans)?.name ?? "membership",
           amount: o.amount_kes,
           mpesaName,
           orderNo: orderNo(o.order_no),

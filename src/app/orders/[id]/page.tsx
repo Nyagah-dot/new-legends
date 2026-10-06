@@ -11,6 +11,14 @@ import { getCurrentProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/timetable";
 import { fmtLong, kes, orderNo } from "@/lib/orders";
+import { one, type Rel } from "@/lib/rel";
+
+type OrderView = {
+  id: string; order_no: number; status: string; amount_kes: number; mpesa_name: string | null;
+  reject_reason: string | null; member_id: string;
+  plans: Rel<{ name: string; duration_days: number }>;
+  memberships: Rel<{ starts_on: string; base_ends_on: string }>;
+};
 
 export const metadata: Metadata = { title: "Your payment — THE LEGENDS FITNESS" };
 
@@ -22,15 +30,17 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   if (!profile) redirect(`/login?next=${encodeURIComponent(`/orders/${id}`)}`);
 
   const supabase = await createClient();
-  const { data: order } = await supabase
+  const { data: orderRaw } = await supabase
     .from("orders")
     .select("id, order_no, status, amount_kes, mpesa_name, reject_reason, member_id, plans(name, duration_days), memberships(starts_on, base_ends_on)")
     .eq("id", id)
     .maybeSingle();
+  const order = orderRaw as unknown as OrderView | null;
   if (!order || order.member_id !== profile.id) notFound();
+  const membership = one(order.memberships);
 
   const { data: settings } = await supabase.from("gym_settings").select("paybill_number, paybill_account").maybeSingle();
-  const planName: string = order.plans?.name ?? "membership";
+  const planName: string = one(order.plans)?.name ?? "membership";
   const ref = orderNo(order.order_no);
 
   return (
@@ -91,8 +101,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         <>
           <div className="pay-state good">
             <strong>Your {planName} membership is active.</strong>
-            {order.memberships
-              ? <>From {fmtLong(order.memberships.starts_on)} to {fmtLong(order.memberships.base_ends_on)}.</>
+            {membership
+              ? <>From {fmtLong(membership.starts_on)} to {fmtLong(membership.base_ends_on)}.</>
               : <>Welcome to The Legends Fitness.</>}
           </div>
           <Link href="/account" className="btn btn-primary">Go to my account <span className="arrow">&rarr;</span></Link>

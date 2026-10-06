@@ -2,6 +2,9 @@ import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { kes } from "@/lib/orders";
+import { one, type Rel } from "@/lib/rel";
+
+type OpenOrder = { id: string; status: string; amount_kes: number; plans: Rel<{ name: string }> };
 
 export default async function AccountPage() {
   // Re-check here too: layouts don't re-run on every client-side navigation.
@@ -15,23 +18,24 @@ export default async function AccountPage() {
     .eq("member_id", profile.id)
     .maybeSingle();
 
-  const { data: openOrders } = await supabase
+  const { data: openOrdersRaw } = await supabase
     .from("orders")
     .select("id, status, amount_kes, plans(name)")
     .eq("member_id", profile.id)
     .in("status", ["awaiting_payment", "payment_claimed"])
     .order("created_at", { ascending: false });
+  const openOrders = (openOrdersRaw ?? []) as unknown as OpenOrder[];
 
   return (
     <>
       <h1>Hi {profile.fullName.split(" ")[0] || "there"}</h1>
       <p className="lead">Member no. LF-{String(profile.memberNo).padStart(4, "0")}</p>
 
-      {(openOrders ?? []).map((o) => (
+      {openOrders.map((o) => (
         <section key={o.id} className="portal-card" style={{ borderColor: "var(--red)" }}>
           <h2>{o.status === "awaiting_payment" ? "Finish your payment" : "Payment under review"}</h2>
           <p style={{ marginBottom: 12 }}>
-            {o.plans?.name ?? "Membership"} · {kes(o.amount_kes)}.{" "}
+            {one(o.plans)?.name ?? "Membership"} · {kes(o.amount_kes)}.{" "}
             {o.status === "awaiting_payment"
               ? "Pay with M-Pesa, then tap “I've paid”."
               : "We're confirming it. You'll get an email once your membership is active."}

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { acceptOrder, rejectOrder } from "./actions";
 import { fmtStamp, kes, namesMatch, orderNo } from "@/lib/orders";
 import { nairobiToday } from "@/lib/timetable";
+import { one, type Rel } from "@/lib/rel";
 
 const SELECT =
   "id, order_no, status, amount_kes, mpesa_name, claimed_at, created_at, decided_at, reject_reason, plans(name), profiles!orders_member_id_fkey(full_name, email, phone, member_no)";
@@ -14,6 +15,16 @@ type Row = {
   plans: { name: string } | null;
   profiles: { full_name: string; email: string | null; phone: string | null; member_no: number } | null;
 };
+
+type RawRow = Omit<Row, "plans" | "profiles"> & {
+  plans: Rel<{ name: string }>;
+  profiles: Rel<{ full_name: string; email: string | null; phone: string | null; member_no: number }>;
+};
+
+/** Turns the database rows into plain objects (whichever way the type checker sees the relations). */
+function toRows(data: unknown): Row[] {
+  return ((data ?? []) as RawRow[]).map((r) => ({ ...r, plans: one(r.plans), profiles: one(r.profiles) }));
+}
 
 function Card({ o, today, actions }: { o: Row; today: string; actions: boolean }) {
   const claimed = o.status === "payment_claimed";
@@ -131,14 +142,14 @@ export default async function PaymentsPage({
       {(review.data ?? []).length === 0 ? (
         <p className="portal-card">Nothing waiting. 🎉</p>
       ) : (
-        (review.data as Row[]).map((o) => <Card key={o.id} o={o} today={today} actions />)
+        toRows(review.data).map((o) => <Card key={o.id} o={o} today={today} actions />)
       )}
 
       <h2 className="pay-h">Started but not marked as paid ({waiting.data?.length ?? 0})</h2>
       {(waiting.data ?? []).length === 0 ? (
         <p className="portal-card">None.</p>
       ) : (
-        (waiting.data as Row[]).map((o) => <Card key={o.id} o={o} today={today} actions />)
+        toRows(waiting.data).map((o) => <Card key={o.id} o={o} today={today} actions />)
       )}
       <p style={{ fontSize: ".85rem", color: "var(--steel)" }}>
         Unpaid orders disappear after 48 hours. If someone paid but forgot to press &ldquo;I&rsquo;ve paid&rdquo;, you can still accept them from here.
@@ -148,7 +159,7 @@ export default async function PaymentsPage({
       {(recent.data ?? []).length === 0 ? (
         <p className="portal-card">Nothing yet.</p>
       ) : (
-        (recent.data as Row[]).map((o) => <Card key={o.id} o={o} today={today} actions={false} />)
+        toRows(recent.data).map((o) => <Card key={o.id} o={o} today={today} actions={false} />)
       )}
     </>
   );

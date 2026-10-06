@@ -7,6 +7,13 @@ import { requireRole } from "@/lib/auth/session";
 import { sendEmail } from "@/lib/email/send";
 import { membershipApprovedEmail, paymentNotConfirmedEmail } from "@/lib/email/templates";
 import { isUuid } from "@/lib/timetable";
+import { one, type Rel } from "@/lib/rel";
+
+type MailInfo = {
+  amount_kes?: number;
+  plans: Rel<{ name: string }>;
+  profiles: Rel<{ full_name: string; email: string | null }>;
+};
 
 const LOGIN = "/desk/login?as=admin";
 const text = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -35,19 +42,22 @@ export async function acceptOrder(formData: FormData) {
 
   let mail: "ok" | "fail" | "skip" | "credits" = "skip";
   try {
-    const { data: o } = await supabase
+    const { data: raw } = await supabase
       .from("orders")
       .select("amount_kes, plans(name), profiles!orders_member_id_fkey(full_name, email)")
       .eq("id", id)
       .maybeSingle();
+    const o = raw as unknown as MailInfo | null;
+    const who = one(o?.profiles);
+    const plan = one(o?.plans);
     const { data: m } = await supabase.from("memberships").select("starts_on, base_ends_on").eq("id", membershipId).maybeSingle();
-    const email: string | undefined = o?.profiles?.email ?? undefined;
+    const email: string | undefined = who?.email ?? undefined;
     if (email && m) {
       const sent = await sendEmail({
         to: email,
         ...membershipApprovedEmail({
-          name: o?.profiles?.full_name,
-          planName: o?.plans?.name ?? "membership",
+          name: who?.full_name,
+          planName: plan?.name ?? "membership",
           startsOn: m.starts_on,
           endsOn: m.base_ends_on,
           amount: o?.amount_kes ?? 0,
@@ -81,16 +91,18 @@ export async function rejectOrder(formData: FormData) {
 
   let mail: "ok" | "fail" | "skip" | "credits" = "skip";
   try {
-    const { data: o } = await supabase
+    const { data: raw } = await supabase
       .from("orders")
       .select("plans(name), profiles!orders_member_id_fkey(full_name, email)")
       .eq("id", id)
       .maybeSingle();
-    const email: string | undefined = o?.profiles?.email ?? undefined;
+    const o = raw as unknown as MailInfo | null;
+    const who = one(o?.profiles);
+    const email: string | undefined = who?.email ?? undefined;
     if (email) {
       const sent = await sendEmail({
         to: email,
-        ...paymentNotConfirmedEmail({ name: o?.profiles?.full_name, planName: o?.plans?.name ?? "membership", reason }),
+        ...paymentNotConfirmedEmail({ name: who?.full_name, planName: one(o?.plans)?.name ?? "membership", reason }),
       });
       mail = sent.ok ? "ok" : sent.code === "insufficient_credits" ? "credits" : "fail";
       if (!sent.ok) console.error("[reject email]", sent.error);
