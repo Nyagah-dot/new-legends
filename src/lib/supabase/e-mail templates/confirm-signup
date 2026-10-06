@@ -1,0 +1,5 @@
+<!-- Supabase: Authentication -> Email Templates -> "Confirm signup". Subject: Confirm your email — The Legends Fitness -->
+<h2>Welcome to The Legends Fitness</h2>
+<p>Confirm your email to activate your account:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/account">Confirm my email</a></p>
+<p>If you didn't sign up, you can ignore this message.</p>

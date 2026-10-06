@@ -1,0 +1,11 @@
+/* Member / Front desk / Admin switcher on the login pages */
+.login-tabs{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--ink);margin-bottom:26px}
+.auth-card .login-tabs a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 6px;
+  text-align:center;color:var(--ink);text-decoration:none;font-family:var(--font-mono),monospace;font-size:.72rem;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-right:2px solid var(--ink);background:var(--white)}
+.auth-card .login-tabs a:last-child{border-right:0}
+.auth-card .login-tabs a:hover{background:var(--paper);color:var(--red)}
+.auth-card .login-tabs a[aria-current="page"]{background:var(--ink);color:#fff}
+.login-tabs-label{font-family:var(--font-mono),monospace;font-size:.68rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--steel);margin-bottom:8px}
+@media(max-width:380px){.auth-card .login-tabs a{font-size:.64rem;letter-spacing:.03em;padding-inline:2px}}

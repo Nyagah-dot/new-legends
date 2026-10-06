@@ -1,0 +1,6 @@
+/* Cancellation notice above the public timetable */
+.tt-alert{border:2px solid var(--red);background:rgba(232,32,32,.12);padding:16px 20px;margin-bottom:24px;color:#fff}
+.tt-alert strong{font-family:var(--font-mono),monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.tt-alert ul{list-style:none;margin-top:8px;font-size:.92rem}
+.tt-alert li+li{margin-top:4px}
+.tt td>div+div{margin-top:10px}

@@ -1,0 +1,22 @@
+/* Checkout and payment pages */
+.pay-sum{display:grid;gap:10px;margin:0 0 20px}
+.pay-sum div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(20,20,20,.12);padding-bottom:8px}
+.pay-sum dt{font-family:var(--font-mono),monospace;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);align-self:center}
+.pay-sum dd{font-weight:800;text-align:right}
+.pay-steps{margin:0 0 20px;padding-left:20px;line-height:1.75}
+.pay-box{border:2px solid var(--ink);background:var(--paper);padding:6px 16px;margin-bottom:22px}
+.pay-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(20,20,20,.15)}
+.pay-row:last-child{border-bottom:0}
+.pay-row .k{font-family:var(--font-mono),monospace;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.pay-row .v{display:block;font-size:1.4rem;font-weight:800;letter-spacing:.02em;margin-top:2px}
+.copy-btn{background:var(--white);border:2px solid var(--ink);padding:8px 12px;cursor:pointer;min-width:74px;
+  font-family:var(--font-mono),monospace;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.copy-btn:hover{border-color:var(--red);color:var(--red)}
+.pay-after{border-top:2px solid var(--ink);padding-top:20px;margin-top:6px}
+.pay-after h2{font-size:1.05rem;margin-bottom:6px}
+.pay-after p{margin-bottom:14px;font-size:.92rem}
+.pay-state{border-left:4px solid var(--ink);background:var(--paper);padding:16px 18px;margin-bottom:18px}
+.pay-state strong{display:block;font-size:1.1rem;margin-bottom:6px}
+.pay-state.good{border-left-color:#1a8a3a}
+.pay-state.bad{border-left-color:var(--red)}
+.pay-meta{font-size:.82rem;color:var(--steel);margin-top:14px}
