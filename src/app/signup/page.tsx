@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AuthShell from "@/components/auth/AuthShell";
 import SignupForm from "@/components/auth/SignupForm";
+import GoogleButton from "@/components/auth/GoogleButton";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { homeFor, safeNext } from "@/lib/auth/paths";
 
@@ -16,6 +17,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
   return (
     <AuthShell title="Create your account" subtitle="One account for your membership, bookings and receipts.">
       <SignupForm next={next} />
+      <GoogleButton next={next || "/account"} />
     </AuthShell>
   );
 }

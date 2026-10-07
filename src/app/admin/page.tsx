@@ -12,6 +12,10 @@ export default async function AdminPage() {
           <h2>Payments</h2>
           <p>Accept M-Pesa payments so members&rsquo; memberships become active.</p>
         </Link>
+        <Link href="/desk/members">
+          <h2>Members</h2>
+          <p>Search everyone, see who is expiring, and open a member&rsquo;s history.</p>
+        </Link>
         <Link href="/admin/classes">
           <h2>Classes</h2>
           <p>Add, edit or remove the weekly classes that make up the timetable.</p>
