@@ -3,7 +3,6 @@ import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import StatusPill from "@/components/desk/StatusPill";
 import CheckInButton from "@/components/desk/CheckInButton";
-import SellForm from "@/components/desk/SellForm";
 import { lfNo, fmtClock, type MemberRow } from "@/lib/desk";
 import { fmtLong, fmtStamp, kes } from "@/lib/orders";
 import { isUuid, nairobiToday } from "@/lib/timetable";
@@ -62,7 +61,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
 
       <section className="dk-card">
         <h2>Sell a membership</h2>
-        <SellForm memberId={member.id} plans={planList} />
+        <p className="dk-empty">Membership sales are currently unavailable.</p>
       </section>
 
       <h2 className="dk-h">Memberships</h2>
