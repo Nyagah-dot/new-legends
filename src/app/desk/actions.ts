@@ -108,3 +108,80 @@ export async function voidCheckIn(formData: FormData) {
   revalidatePath("/desk");
   redirect(`/desk?done=${error ? "error" : "voided"}`);
 }
+
+/* ---------------------------------------------------------------------------
+ * Freezes (Patch 17). Plain form actions: they redirect back to /desk/freezes
+ * with ?done=<code> (and ?msg=<friendly text> when the database refused).
+ * ------------------------------------------------------------------------- */
+const FREEZES = "/desk/freezes";
+const back = (done: string, msg?: string): never =>
+  redirect(`${FREEZES}?done=${done}${msg ? `&msg=${encodeURIComponent(msg.slice(0, 200))}` : ""}`);
+
+export async function approveFreeze(formData: FormData) {
+  const me = await requireRole(["staff", "admin"], LOGIN);
+  const id = text(formData, "freeze_id");
+  const method = text(formData, "method");
+  const reference = text(formData, "reference");
+  const waive = formData.get("waive") === "on" && me.role === "admin";
+  if (!isUuid(id)) back("error", "Freeze not found.");
+
+  // The fee is only collected when the form showed the payment fields (method is blank otherwise).
+  const m = METHODS.find((x) => x.value === method);
+  if (method && !m) back("error", "Choose how the freeze fee was paid.");
+  if (m?.needsRef && reference.length < 3) back("error", "Enter the transaction code for the fee.");
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("approve_freeze", {
+    p_freeze_id: id,
+    p_fee_method: m ? m.value : null,
+    p_fee_reference: reference || null,
+    p_waive_fee: waive,
+  });
+  revalidatePath(FREEZES);
+  revalidatePath("/desk");
+  revalidatePath("/account", "layout");
+  if (error) {
+    if (error.code === "23505") back("error", "That transaction code has already been used.");
+    back("error", friendly(error, "Couldn't approve the freeze. Please try again."));
+  }
+  back("approved");
+}
+
+export async function rejectFreeze(formData: FormData) {
+  await requireRole(["staff", "admin"], LOGIN);
+  const id = text(formData, "freeze_id");
+  const reason = text(formData, "reason");
+  if (!isUuid(id)) back("error", "Freeze not found.");
+  if (reason.length < 3) back("error", "Give a short reason so the member knows why.");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reject_freeze", { p_freeze_id: id, p_reason: reason });
+  revalidatePath(FREEZES);
+  revalidatePath("/account", "layout");
+  if (error) back("error", friendly(error, "Couldn't reject the freeze. Please try again."));
+  back("rejected");
+}
+
+export async function endFreezeEarly(formData: FormData) {
+  await requireRole(["staff", "admin"], LOGIN);
+  const id = text(formData, "freeze_id");
+  if (!isUuid(id)) back("error", "Freeze not found.");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("end_freeze_early", { p_freeze_id: id });
+  revalidatePath(FREEZES);
+  revalidatePath("/desk");
+  revalidatePath("/account", "layout");
+  if (error) back("error", friendly(error, "Couldn't end the freeze. Please try again."));
+  back("ended");
+}
+
+export async function cancelFreezeAtDesk(formData: FormData) {
+  await requireRole(["staff", "admin"], LOGIN);
+  const id = text(formData, "freeze_id");
+  if (!isUuid(id)) back("error", "Freeze not found.");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("cancel_freeze", { p_freeze_id: id });
+  revalidatePath(FREEZES);
+  revalidatePath("/account", "layout");
+  if (error) back("error", friendly(error, "Couldn't cancel the freeze. Please try again."));
+  back("cancelled");
+}

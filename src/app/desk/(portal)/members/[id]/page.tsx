@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import StatusPill from "@/components/desk/StatusPill";
 import CheckInButton from "@/components/desk/CheckInButton";
+import SellForm from "@/components/desk/SellForm";
 import { lfNo, fmtClock, type MemberRow } from "@/lib/desk";
 import { fmtLong, fmtStamp, kes } from "@/lib/orders";
 import { isUuid, nairobiToday } from "@/lib/timetable";
