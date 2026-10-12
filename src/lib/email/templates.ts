@@ -176,3 +176,45 @@ If this wasn't you, you can ignore this email: nothing has changed.
 The Legends Fitness · Links Road, Nyali, Mombasa`;
   return { subject: "You already have an account — The Legends Fitness", html, text };
 }
+
+/** Sent when an admin accepts the payment for a visitor's single-class booking. */
+export function visitorBookingConfirmedEmail(opts: {
+  name?: string; className: string; date: string; startsAt: string; endsAt: string;
+  coach?: string | null; ladiesOnly?: boolean; bookingNo: string; amount: number; siteUrl: string;
+}) {
+  const hello = opts.name ? `Hi ${first(opts.name)},` : "Hi,";
+  const when = `${fmtLong(opts.date)}, ${opts.startsAt}–${opts.endsAt}`;
+  const html = layout(
+    "You're booked in",
+    `<p style="margin:0 0 12px;line-height:1.5">${esc(hello)}</p>
+<p style="margin:0 0 12px;line-height:1.5">Thank you. We've received your payment of <strong>KES ${opts.amount.toLocaleString("en-KE")}</strong> and your spot is confirmed.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px;font-size:15px">
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">Class</td><td><strong>${esc(opts.className)}${opts.ladiesOnly ? " (Ladies only)" : ""}</strong></td></tr>
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">When</td><td><strong>${esc(when)}</strong></td></tr>${
+      opts.coach ? `\n<tr><td style="padding:3px 18px 3px 0;color:#5A5852">Coach</td><td>${esc(opts.coach)}</td></tr>` : ""
+    }
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">Booking</td><td>${esc(opts.bookingNo)}</td></tr></table>
+<ul style="margin:0 0 12px;padding-left:20px;line-height:1.6;font-size:14px">
+<li>Arrive about 15 minutes early and tell the front desk your name.</li>
+<li>Bring water, a towel and training shoes.</li>
+<li>Can't make it? Please tell the front desk before the class.</li></ul>
+<p style="margin:0;line-height:1.5;font-size:14px;color:#5A5852">The Legends Fitness is at Links Road, Nyali, Mombasa.</p>`,
+    { label: "View my booking", href: opts.siteUrl }
+  );
+  const text = `${hello}
+
+Thank you. We've received your payment of KES ${opts.amount.toLocaleString("en-KE")} and your spot is confirmed.
+
+Class:   ${opts.className}${opts.ladiesOnly ? " (Ladies only)" : ""}
+When:    ${when}${opts.coach ? `\nCoach:   ${opts.coach}` : ""}
+Booking: ${opts.bookingNo}
+
+- Arrive about 15 minutes early and tell the front desk your name.
+- Bring water, a towel and training shoes.
+- Can't make it? Please tell the front desk before the class.
+
+View your booking: ${opts.siteUrl}
+
+The Legends Fitness · Links Road, Nyali, Mombasa`;
+  return { subject: `You're booked: ${opts.className} — The Legends Fitness`, html, text };
+}

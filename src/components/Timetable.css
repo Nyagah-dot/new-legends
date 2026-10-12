@@ -4,3 +4,8 @@
 .tt-alert ul{list-style:none;margin-top:8px;font-size:.92rem}
 .tt-alert li+li{margin-top:4px}
 .tt td>div+div{margin-top:10px}
+
+/* "Try one class" box under the timetable */
+.tt-try{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;padding:20px 24px;border:2px solid #fff}
+.tt-try strong{display:block;font-size:1.15rem;color:#fff;margin-bottom:4px}
+.tt-try span{color:#c9c7c1;font-size:.95rem}

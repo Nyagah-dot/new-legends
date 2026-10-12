@@ -1,4 +1,5 @@
 import "./Timetable.css";
+import Link from "next/link";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DAY_SHORT, addDays, fmtDate, fmtTime, nairobiToday, type ClassRow } from "@/lib/timetable";
 
@@ -34,6 +35,14 @@ async function loadTimetable(): Promise<{ classes: ClassRow[] | null; cancelled:
   };
 }
 
+/** The single-class price shown in the "try a class" box (same price as the day pass). */
+async function loadTryPrice(): Promise<number> {
+  const supabase = createPublicClient();
+  if (!supabase) return 1000;
+  const { data } = await supabase.from("plans").select("price_kes").eq("code", "day_pass").maybeSingle();
+  return (data as { price_kes: number } | null)?.price_kes ?? 1000;
+}
+
 function buildSlots(classes: ClassRow[]): Slot[] {
   const slots = new Map<string, Slot>();
   for (const c of classes) {
@@ -45,7 +54,7 @@ function buildSlots(classes: ClassRow[]): Slot[] {
 }
 
 export default async function Timetable() {
-  const { classes, cancelled, problem } = await loadTimetable();
+  const [{ classes, cancelled, problem }, tryPrice] = await Promise.all([loadTimetable(), loadTryPrice()]);
   const slots = classes ? buildSlots(classes) : [];
 
   return (
@@ -125,6 +134,14 @@ export default async function Timetable() {
             <p className="ttnote">Ladies Only sessions are marked in red. Times are 24-hour.</p>
           </>
         )}
+
+        <div className="tt-try">
+          <div>
+            <strong>New here? Try one class.</strong>
+            <span>No membership needed. Book a single coached class for KES {tryPrice.toLocaleString("en-KE")}.</span>
+          </div>
+          <Link href="/book" className="btn btn-primary">Try a class <span className="arrow">&rarr;</span></Link>
+        </div>
       </div>
     </section>
   );

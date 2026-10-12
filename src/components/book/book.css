@@ -1,0 +1,18 @@
+/* Visitor single-class booking pages */
+.bk-main{width:100%;max-width:760px;margin:clamp(20px,5vh,56px) auto;padding:0 var(--pad)}
+.bk-main h1{font-size:clamp(1.8rem,5vw,2.6rem);margin-bottom:10px}
+.bk-main .lead{margin-bottom:22px}
+.bk-card{background:var(--white);border:2px solid var(--ink);padding:clamp(20px,4vw,36px);margin-bottom:20px}
+.bk-note{padding:12px 16px;border-left:4px solid var(--ink);background:var(--white);margin-bottom:18px;font-weight:600}
+.bk-note.err{border-left-color:var(--red);color:var(--red)}
+.bk-day{font-family:var(--font-mono),monospace;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--ink);color:#fff;padding:8px 14px;margin-top:22px}
+.bk-list{border:2px solid var(--ink);border-top:0;background:var(--white)}
+.bk-item{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid rgba(20,20,20,.15)}
+.bk-item:last-child{border-bottom:0}
+.bk-item .n{font-weight:800;font-size:1.05rem}
+.bk-item .s{display:block;font-size:.84rem;color:var(--steel);font-weight:500}
+.bk-left{font-family:var(--font-mono),monospace;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--steel)}
+.bk-left.low{color:var(--red)}
+.bk-act{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bk-rules{margin:0 0 20px;padding-left:20px;line-height:1.7;font-size:.95rem}
