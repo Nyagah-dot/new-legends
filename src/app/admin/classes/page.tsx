@@ -1,46 +1,72 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
+import DeleteClassButton from "@/components/admin/DeleteClassButton";
+import { daysLabel, fmtTime, type ClassRow } from "@/lib/timetable";
 
-export default async function AdminPage() {
+const NOTES: Record<string, { text: string; err?: boolean }> = {
+  saved: { text: "Saved. The public timetable is updated." },
+  deleted: { text: "Class deleted." },
+  error: { text: "Something went wrong. Please try again.", err: true },
+};
+
+export default async function ClassesPage({ searchParams }: { searchParams: Promise<{ done?: string }> }) {
   await requireRole(["admin"], "/desk/login?as=admin");
+  const { done } = await searchParams;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("classes").select("*").order("starts_at").order("name");
+  const classes = (data ?? []) as ClassRow[];
+  const note = done ? NOTES[done] : undefined;
+
   return (
     <>
-      <h1>Admin</h1>
-      <p className="lead">Run the gym from here.</p>
-      <div className="adm-cards">
-        <Link href="/admin/payments">
-          <h2>Payments</h2>
-          <p>Accept M-Pesa payments so members&rsquo; memberships become active.</p>
-        </Link>
-        <Link href="/desk/members">
-          <h2>Members</h2>
-          <p>Search everyone, see who is expiring, and open a member&rsquo;s history.</p>
-        </Link>
-        <Link href="/admin/visitors">
-          <h2>Single classes</h2>
-          <p>Accept payments from visitors who booked one class, and cancel a booking if needed.</p>
-        </Link>
-        <Link href="/admin/classes">
-          <h2>Classes</h2>
-          <p>Add, edit or remove the weekly classes that make up the timetable.</p>
-        </Link>
-        <Link href="/admin/sessions">
-          <h2>Dates</h2>
-          <p>Cancel or restore a single day, and create the coming weeks&rsquo; dates.</p>
-        </Link>
-        <Link href="/admin/people">
-          <h2>People and roles</h2>
-          <p>Make someone front desk staff or an admin.</p>
-        </Link>
-        <Link href="/admin/settings">
-          <h2>Settings</h2>
-          <p>Plans and prices, the M-Pesa Paybill details, visitor spots and the freeze rules.</p>
-        </Link>
+      <div className="adm-head">
+        <div>
+          <h1>Classes</h1>
+          <p className="lead">The weekly pattern. Saving rebuilds the upcoming dates and updates the website.</p>
+        </div>
+        <Link href="/admin/classes/new" className="btn btn-primary">Add class <span className="arrow">&rarr;</span></Link>
       </div>
-      <section className="portal-card portal-soon" style={{ marginTop: 20 }}>
-        <h2>Coming next</h2>
-        <p>Cancel and refund a membership, expiry reminder emails and the marketing email list arrive in the next patch.</p>
-      </section>
+
+      {note && <p className={`adm-note${note.err ? " err" : ""}`} role="status">{note.text}</p>}
+      {error && <p className="adm-note err" role="alert">Couldn&rsquo;t load classes: {error.message}</p>}
+
+      {classes.length === 0 && !error ? (
+        <p className="portal-card">No classes yet. Add your first one.</p>
+      ) : (
+        <div className="adm-scroll">
+          <table className="adm-table">
+            <thead>
+              <tr><th>Class</th><th>Days</th><th>Time</th><th>Spaces</th><th>Notes</th><th></th></tr>
+            </thead>
+            <tbody>
+              {classes.map((c) => (
+                <tr key={c.id} className={c.is_active ? undefined : "off"}>
+                  <td>
+                    <strong>{c.name}</strong>
+                    {c.coach_name && <span className="sub">{c.coach_name}</span>}
+                  </td>
+                  <td>{daysLabel(c.weekdays)}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>{fmtTime(c.starts_at)}–{fmtTime(c.ends_at)}</td>
+                  <td>{c.capacity ?? "No limit"}</td>
+                  <td>
+                    {c.ladies_only && <span className="adm-tag red">Ladies</span>}
+                    {!c.bookable && <span className="adm-tag">Turn up</span>}
+                    {!c.is_active && <span className="adm-tag dark">Hidden</span>}
+                  </td>
+                  <td>
+                    <div className="adm-actions">
+                      <Link href={`/admin/classes/${c.id}`} className="btn btn-ghost btn-sm">Edit</Link>
+                      <DeleteClassButton id={c.id} name={c.name} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   );
 }
