@@ -10,6 +10,8 @@ const TABS = [
   { href: "/admin/visitors", label: "Single classes", visitors: true },
   { href: "/admin/classes", label: "Classes" },
   { href: "/admin/sessions", label: "Dates" },
+  { href: "/admin/people", label: "People" },
+  { href: "/admin/settings", label: "Settings" },
 ];
 
 export default function AdminNav({ pending = 0, visitorsPending = 0 }: { pending?: number; visitorsPending?: number }) {
