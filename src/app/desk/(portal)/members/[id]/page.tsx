@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import StatusPill from "@/components/desk/StatusPill";
 import CheckInButton from "@/components/desk/CheckInButton";
 import SellForm from "@/components/desk/SellForm";
-import { lfNo, fmtClock, type MemberRow } from "@/lib/desk";
+import { lfNo, fmtClock, METHODS, type MemberRow } from "@/lib/desk";
 import { fmtLong, fmtStamp, kes } from "@/lib/orders";
 import { isUuid, nairobiToday } from "@/lib/timetable";
+import { cancelMembership } from "@/app/desk/membership-actions";
 
 type Status = { plan_name: string; state: string; starts_on: string; ends_on: string; days_left: number; paid_until: string | null };
 type Membership = { membership_id: string; plan_name: string; starts_on: string; ends_on: string; state: string; days_left: number; frozen_days: number };
@@ -15,9 +16,10 @@ type Visit = { id: string; checked_in_at: string; checked_in_on: string };
 type Payment = { id: string; kind: string; method: string; status: string; amount_kes: number; reference: string | null; paid_at: string | null };
 type Plan = { code: string; name: string; price_kes: number };
 
-export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(["staff", "admin"], "/desk/login");
+export default async function MemberPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ done?: string; msg?: string }> }) {
+  const me = await requireRole(["staff", "admin"], "/desk/login");
   const { id } = await params;
+  const sp = await searchParams;
   if (!isUuid(id)) notFound();
 
   const supabase = await createClient();
@@ -40,9 +42,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const payments = (pays.data ?? []) as unknown as Payment[];
   const planList = (plans.data ?? []) as unknown as Plan[];
   const today = nairobiToday();
+  const cancellable = memberships.filter((m) => m.state !== "cancelled");
 
   return (
     <>
+      {sp.done === "cancelled" && <p className="portal-card" role="status">Membership cancelled.</p>}
+      {sp.done === "error" && <p className="portal-card" role="alert">{sp.msg || "Something went wrong."}</p>}
       <div className="dk-head">
         <h1>{member.full_name || "(no name)"}</h1>
         <p className="meta">
@@ -62,7 +67,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
 
       <section className="dk-card">
         <h2>Sell a membership</h2>
-        <p className="dk-empty">Membership sales are currently unavailable.</p>
+        <SellForm memberId={member.id} plans={planList} />
       </section>
 
       <h2 className="dk-h">Memberships</h2>
@@ -84,6 +89,42 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
             </tbody>
           </table>
         </div>
+      )}
+
+      {me.role === "admin" && cancellable.length > 0 && (
+        <section className="dk-card">
+          <h2>Cancel a membership (admin)</h2>
+          <p style={{ fontSize: ".88rem", color: "var(--steel)", marginBottom: 12 }}>
+            Ends the membership now and cancels any freeze booked on it. If you refunded money, enter the amount: it is recorded
+            and can never be more than what was paid. This cannot be undone.
+          </p>
+          <form action={cancelMembership} className="dk-form" style={{ display: "grid", gap: 10, maxWidth: 460 }}>
+            <input type="hidden" name="member_id" value={member.id} />
+            <label>Which membership
+              <select name="membership_id" required defaultValue="">
+                <option value="" disabled>Choose…</option>
+                {cancellable.map((m) => (
+                  <option key={m.membership_id} value={m.membership_id}>{m.plan_name}: {fmtLong(m.starts_on)} to {fmtLong(m.ends_on)}</option>
+                ))}
+              </select>
+            </label>
+            <label>Reason
+              <input type="text" name="reason" required minLength={3} maxLength={200} placeholder="e.g. Moved away, paid twice" />
+            </label>
+            <label>Refund amount in KES (0 if none)
+              <input type="number" name="refund" min={0} step={1} defaultValue={0} inputMode="numeric" />
+            </label>
+            <label>Refunded by
+              <select name="method" defaultValue="cash">
+                {METHODS.map((x) => <option key={x.value} value={x.value}>{x.label}</option>)}
+              </select>
+            </label>
+            <label>Reference (M-Pesa code, if any)
+              <input type="text" name="reference" maxLength={60} />
+            </label>
+            <button type="submit" className="btn btn-sm">Cancel this membership</button>
+          </form>
+        </section>
       )}
 
       <h2 className="dk-h">Recent visits</h2>

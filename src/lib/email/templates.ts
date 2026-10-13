@@ -218,3 +218,26 @@ View your booking: ${opts.siteUrl}
 The Legends Fitness · Links Road, Nyali, Mombasa`;
   return { subject: `You're booked: ${opts.className} — The Legends Fitness`, html, text };
 }
+
+/** Sent 7 days and 1 day before a membership ends. */
+export function membershipExpiringEmail(opts: { name?: string; planName: string; endsOn: string; daysLeft: number; renewUrl: string }) {
+  const hello = opts.name ? `Hi ${first(opts.name)},` : "Hi,";
+  const when = opts.daysLeft === 1 ? "tomorrow" : `in ${opts.daysLeft} days`;
+  const html = layout(
+    `Your membership ends ${when}`,
+    `<p style="margin:0 0 12px;line-height:1.5">${esc(hello)}</p>
+<p style="margin:0 0 12px;line-height:1.5">Your <strong>${esc(opts.planName)}</strong> membership at The Legends Fitness ends on <strong>${esc(fmtLong(opts.endsOn))}</strong>.</p>
+<p style="margin:0;line-height:1.5;font-size:14px;color:#5A5852">Renew now and your next period starts the day after this one ends, so you lose no days.</p>`,
+    { label: "Renew my membership", href: opts.renewUrl }
+  );
+  const text = `${hello}
+
+Your ${opts.planName} membership at The Legends Fitness ends on ${fmtLong(opts.endsOn)}.
+
+Renew now and your next period starts the day after this one ends, so you lose no days.
+
+Renew: ${opts.renewUrl}
+
+The Legends Fitness · Links Road, Nyali, Mombasa`;
+  return { subject: `Your membership ends ${when} — The Legends Fitness`, html, text };
+}
