@@ -10,7 +10,7 @@ import Pricing from "@/components/Pricing";
 import Location from "@/components/Location";
 import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
-import RevealObserver from "@/components/RevealObserver";
+
 
 // The timetable comes from the database and is read fresh on every visit,
 // so changes made in Admin -> Classes appear straight away.
@@ -34,7 +34,7 @@ export default function Home() {
         <FinalCta />
       </main>
       <Footer />
-      <RevealObserver />
+
     </>
   );
 }
