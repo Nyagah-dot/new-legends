@@ -1,4 +1,8 @@
-/*WHY THE LEGENDS — horizontal card rail (Gymbox-style), namespaced  */
+/* ==========================================================================
+   WHY THE LEGENDS — horizontal card rail (Gymbox-style), namespaced .lwhy
+   Mobile / touch / reduced-motion: native swipe scroller (scroll-snap).
+   Desktop fine-pointer: JS adds .is-pinned -> section pins, track scrubs.
+   ========================================================================== */
 .lwhy{
   --lwhy-gap:clamp(12px,1.4vw,20px);
   position:relative;overflow:clip;background:#000;color:#fff;
@@ -6,29 +10,8 @@
   scroll-margin-top:var(--header-height,70px);
 }
 
-/* ---- head ---- */
-.lwhy__head{display:grid;gap:20px;align-items:end;
-  padding-inline:var(--page-gutter,clamp(20px,5vw,88px));margin-bottom:clamp(28px,4vw,56px)}
-.lwhy__eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;
-  font-family:var(--font-utility),monospace;font-size:var(--text-xs,.75rem);font-weight:700;
-  letter-spacing:var(--tracking-wide,.12em);text-transform:uppercase;color:#fff}
-.lwhy__eyebrow::before{content:"";width:8px;height:8px;background:var(--color-red,#E82020)}
-.lwhy__eyebrow b{color:var(--color-red,#E82020);font-weight:700}
-
-.lwhy__title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
-  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.005em;
-  font-size:clamp(2.6rem,min(13vw,10svh),5.4rem);line-height:.92;text-wrap:nowrap;color:#fff}
-.lwhy__mask{display:block;overflow:hidden;padding:.07em .04em .09em;margin:-.07em -.04em -.09em}
-.lwhy__mask--red{color:var(--color-red,#E82020)}
-.lwhy__line{display:inline-block;will-change:transform}
-.lwhy__lead{max-width:38ch;color:var(--color-muted,#A8A6A0);font-size:clamp(.95rem,1.2vw,1.1rem);line-height:1.55}
-
-@media (min-width:900px){
-  .lwhy__head{grid-template-columns:1fr auto;gap:48px}
-  .lwhy__title{font-size:clamp(2.6rem,min(5.4vw,9svh),5.4rem)}
-  .lwhy__lead{padding-bottom:.6em}
-}
-@media (max-width:480px){.lwhy__title{text-wrap:balance}.lwhy__line{white-space:normal}}
+/* ---- head (SectionHeader supplies type + animation) ---- */
+.lwhy__head{padding-inline:var(--page-gutter,clamp(20px,5vw,88px));margin-bottom:clamp(28px,4vw,56px)}
 
 /* ---- rail (native scroller by default) ---- */
 .lwhy__rail{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
@@ -86,6 +69,7 @@
   letter-spacing:.12em;text-transform:uppercase;color:var(--color-muted,#A8A6A0)}
 .lwhy__hint i{font-style:normal;color:var(--color-red,#E82020)}
 .lwhy__hint [data-when="pin"]{display:none}
+.lwhy__foot .rc{margin-left:auto}
 .lwhy__progress{display:none;position:relative;flex:1;height:2px;background:rgb(255 255 255 / 18%);overflow:hidden}
 .lwhy__bar{position:absolute;inset:0;background:var(--color-red,#E82020);transform:scaleX(0);transform-origin:left}
 
@@ -94,8 +78,9 @@
   display:flex;flex-direction:column;justify-content:center;
   padding-block:clamp(24px,4svh,48px)}
 .lwhy.is-pinned .lwhy__head{margin-bottom:clamp(20px,3.5svh,40px)}
+.lwhy.is-pinned .lwhy__foot .rc{margin-left:0}
 .lwhy.is-pinned .lwhy__rail{overflow:visible;scroll-snap-type:none}
-.lwhy.is-pinned .lwhy__card{--h:min(52svh,560px);height:var(--h);width:calc(var(--h) * .74);aspect-ratio:auto}
+.lwhy.is-pinned .lwhy__card{--h:min(46svh,520px);height:var(--h);width:calc(var(--h) * .74);aspect-ratio:auto}
 .lwhy.is-pinned .lwhy__foot{margin-top:clamp(16px,3svh,32px)}
 .lwhy.is-pinned .lwhy__progress{display:block}
 .lwhy.is-pinned [data-when="native"]{display:none}

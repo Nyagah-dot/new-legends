@@ -5,18 +5,15 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import CircleCta from "./CircleCta";
+import RectCta from "./RectCta";
+import SectionHeader from "./SectionHeader";
 import { headerOffset } from "@/lib/motion";
 import { TIMETABLE_HREF } from "@/lib/site";
 import "./Why.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-/* ------------------------------------------------------------------
-   CARDS — edit copy / order / images here only.
-   Cards 1-4 are the original "why" points. Cards 5-6 are the two extra
-   upsells (equipment + recovery): the copy is a PLACEHOLDER, replace
-   it with what the gym really offers.
-------------------------------------------------------------------- */
+/* CARDS  */
 const CARDS = [
   { n: "01", title: "Coached, not sold to", text: "Certified strength coaches on the floor — not staff chasing commission.", img: "/images/why-legend/coach.webp", alt: "Coach demonstrating a squat" },
   { n: "02", title: "Real weight", text: "Racks, bars and space to train hard. No apologising for intensity.", img: "/images/why-legend/weights.webp", alt: "Athlete training back with heavy weights" },
@@ -40,7 +37,6 @@ export default function Why() {
       if (!el || !railEl || !trackEl) return;
 
       const cards = gsap.utils.toArray<HTMLElement>("[data-card]", el);
-      const lines = gsap.utils.toArray<HTMLElement>("[data-line]", el);
       const fades = gsap.utils.toArray<HTMLElement>("[data-fade]", el);
 
       const mm = gsap.matchMedia();
@@ -51,23 +47,22 @@ export default function Why() {
         },
         (ctx) => {
           const { motion, pin } = ctx.conditions as { motion: boolean; pin: boolean };
-          if (!motion) return; // reduced motion: static layout, native swipe scroller
+          if (!motion) return; //  native swipe scroller
 
-          /* ---- hidden start states ---- */
-          gsap.set(lines, { yPercent: 115 });
+          /* hidden start states */
           gsap.set(fades, { autoAlpha: 0, y: 24 });
           gsap.set(cards, { clipPath: "inset(100% 0% 0% 0%)" });
           gsap.set(gsap.utils.toArray("[data-img]", el), { scale: 1.3 });
           gsap.set(gsap.utils.toArray("[data-info]", el), { y: 36, autoAlpha: 0 });
 
-          /* one card's reveal: wipe up, image settles, text rises */
+          /* cards reveal */
           const revealTo = (tl: gsap.core.Timeline, card: HTMLElement, at: number) => {
             tl.to(card, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, ease: "expo.inOut" }, at)
               .to(card.querySelector("[data-img]"), { scale: 1, duration: 1.8, ease: "expo.out" }, at + 0.1)
               .to(card.querySelectorAll("[data-info]"), { y: 0, autoAlpha: 1, duration: 1, ease: "expo.out", stagger: 0.08 }, at + 0.5);
           };
 
-          /* ---- desktop: pin the section, scrub the track sideways ---- */
+          /* desktop -scrub */
           let scrollTween: gsap.core.Tween | undefined;
           if (pin) {
             el.classList.add("is-pinned");
@@ -93,14 +88,13 @@ export default function Why() {
             });
           }
 
-          /* ---- entrance: heading + the cards already on screen ---- */
+          /*  entrance */
           const enter = gsap.timeline({
             defaults: { ease: "expo.out" },
             scrollTrigger: { trigger: el, start: "top 72%", once: true },
           });
-          enter
-            .to(lines, { yPercent: 0, duration: 1.2, stagger: 0.12 }, 0)
-            .to(fades, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1 }, 0.25);
+          // heading animation
+          enter.to(fades, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1 }, 0.9);
 
           let shown = 0;
           cards.forEach((card) => {
@@ -109,7 +103,7 @@ export default function Why() {
               revealTo(enter, card, 0.35 + shown++ * 0.12);
               return;
             }
-            // off-screen cards reveal as they slide / swipe into view
+            //  swipe into view
             const t = gsap.timeline({
               scrollTrigger: scrollTween
                 ? { trigger: card, containerAnimation: scrollTween, start: "left 90%", once: true }
@@ -127,24 +121,12 @@ export default function Why() {
 
   return (
     <section id="about" className="lwhy" ref={root}>
-      <div className="lwhy__head">
-        <div>
-          <span className="lwhy__eyebrow" data-fade>
-            Why The <b>Legends</b>
-          </span>
-          <h2 className="lwhy__title" aria-label="A gym that does the work with you.">
-            <span className="lwhy__mask" aria-hidden="true">
-              <span className="lwhy__line" data-line>A gym that does the work</span>
-            </span>
-            <span className="lwhy__mask lwhy__mask--red" aria-hidden="true">
-              <span className="lwhy__line" data-line>with you.</span>
-            </span>
-          </h2>
-        </div>
-        <p className="lwhy__lead" data-fade>
-          Serious coaching, real weight and zero ego — with a proper way in if you’ve never trained.
-        </p>
-      </div>
+      <SectionHeader
+        className="lwhy__head"
+        eyebrow={<>Why The <b>Legends</b></>}
+        lines={[{ text: "A gym that does the work" }, { text: "with you.", accent: true }]}
+        rule
+      />
 
       <div className="lwhy__rail" ref={rail} tabIndex={0} role="region" aria-label="Why The Legends — scroll sideways for more">
         <div className="lwhy__track" ref={track}>
@@ -185,6 +167,7 @@ export default function Why() {
         <span className="lwhy__progress" aria-hidden="true">
           <span className="lwhy__bar" ref={bar} />
         </span>
+        <RectCta href={TIMETABLE_HREF} label="View classes" appear="none" />
       </div>
     </section>
   );
