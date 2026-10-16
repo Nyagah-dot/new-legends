@@ -35,8 +35,8 @@ export default function Home() {
         <PostHeroGrid />
         <Why />
         <Improv />      
-        <Timetable />
-        <Steps />
+        {/* <Timetable /> */}
+        {/* <Steps /> */}
         <Tour />
         <Coaches />
         <Testimonials />

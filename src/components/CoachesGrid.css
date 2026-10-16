@@ -1,0 +1,90 @@
+/* COACHES grid — image cards with a hover / focus / tap reveal. Namespace .lcg */
+.lcg{background:var(--color-ink);color:#fff;
+  padding-block:var(--section-space-compact,clamp(56px,8vw,112px))}
+.lcg__grid{width:100%;max-width:var(--container-wide,1600px);margin-inline:auto;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px));
+  display:grid;gap:clamp(12px,1.6vw,24px);grid-template-columns:1fr}
+@media(min-width:640px){.lcg__grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.lcg__grid{grid-template-columns:repeat(4,1fr)}}
+
+.lcg__card{position:relative;aspect-ratio:5/7;overflow:hidden;background:#0c0c0c;
+  cursor:pointer;outline-offset:4px}
+
+/* image: wrapper scales on hover (CSS), the <img> itself is scaled by GSAP on reveal */
+.lcg__media{position:absolute;inset:0;transition:transform 1.2s var(--ease-out-expo)}
+.lcg__media img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;
+  transition:filter .8s var(--ease-out-expo)}
+
+/* resting label (white box, bottom-left) */
+.lcg__label{position:absolute;left:0;bottom:0;z-index:2;width:min(82%,300px);
+  background:var(--color-paper-light,#F8F6F1);color:var(--color-ink);padding:16px 18px 14px;
+  transition:transform .7s var(--ease-out-expo)}
+.lcg__name{font-family:var(--font-body),system-ui,sans-serif;font-size:1.05rem;line-height:1.15;
+  letter-spacing:-.01em;text-transform:none}
+.lcg__role{margin-top:4px;font-family:var(--font-utility),monospace;font-size:.68rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--color-red)}
+.lcg__bio{margin-top:10px;display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem}
+.lcg__bio svg{transition:transform .5s var(--ease-out-expo)}
+
+/* reveal panel */
+.lcg__panel{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;gap:14px;
+  padding:clamp(18px,1.8vw,28px);background:rgb(20 20 20 / 80%);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;
+  clip-path:inset(100% 0 0 0);visibility:hidden;
+  transition:clip-path .8s var(--ease-out-expo),visibility 0s .8s}
+.lcg__panel>*{opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .8s var(--ease-out-expo)}
+
+.lcg__panel-role{font-family:var(--font-utility),monospace;font-size:.68rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--color-red-soft,#F04438)}
+.lcg__panel-name{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;font-size:clamp(2rem,2.6vw,2.8rem);line-height:.95;
+  letter-spacing:.01em;text-transform:uppercase}
+.lcg__blurb{font-size:.88rem;line-height:1.45;font-weight:500;color:#d9d7d1;text-transform:none}
+
+.lcg__block h4{font-family:var(--font-utility),monospace;font-size:.66rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--color-muted,#A8A6A0);margin-bottom:8px}
+.lcg__block ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 14px}
+.lcg__block li{font-size:.84rem;font-weight:700;line-height:1.3}
+
+.lcg__book{margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;background:var(--color-red);color:#fff;font-weight:800;font-size:.82rem;
+  letter-spacing:.06em;text-transform:uppercase;transition:background .4s,color .4s}
+.lcg__book svg{transition:transform .5s var(--ease-out-expo)}
+.lcg__book:hover{background:#fff;color:var(--color-ink)}
+.lcg__book:hover svg{transform:translateX(5px)}
+
+/* ---- open state: keyboard focus, tap (data-open), and real hover ---- */
+.lcg__card[data-open="true"] .lcg__panel,
+.lcg__card:is(:focus-visible,:has(:focus-visible)) .lcg__panel{
+  clip-path:inset(0);visibility:visible;transition:clip-path .8s var(--ease-out-expo),visibility 0s}
+.lcg__card[data-open="true"] .lcg__panel>*,
+.lcg__card:is(:focus-visible,:has(:focus-visible)) .lcg__panel>*{opacity:1;transform:none}
+.lcg__card[data-open="true"] .lcg__media,
+.lcg__card:is(:focus-visible,:has(:focus-visible)) .lcg__media{transform:scale(1.06)}
+.lcg__card[data-open="true"] .lcg__media img,
+.lcg__card:is(:focus-visible,:has(:focus-visible)) .lcg__media img{filter:grayscale(1) brightness(.6)}
+.lcg__card[data-open="true"] .lcg__label,
+.lcg__card:is(:focus-visible,:has(:focus-visible)) .lcg__label{transform:translateY(101%)}
+
+@media(hover:hover){
+  .lcg__card:hover .lcg__panel{clip-path:inset(0);visibility:visible;
+    transition:clip-path .8s var(--ease-out-expo),visibility 0s}
+  .lcg__card:hover .lcg__panel>*{opacity:1;transform:none}
+  .lcg__card:hover .lcg__media{transform:scale(1.06)}
+  .lcg__card:hover .lcg__media img{filter:grayscale(1) brightness(.6)}
+  .lcg__card:hover .lcg__label{transform:translateY(101%)}
+  .lcg__card:hover .lcg__bio svg{transform:translateX(5px)}
+}
+
+/* staggered entrance of the panel's contents */
+.lcg__panel>:nth-child(1){transition-delay:.10s}
+.lcg__panel>:nth-child(2){transition-delay:.15s}
+.lcg__panel>:nth-child(3){transition-delay:.20s}
+.lcg__panel>:nth-child(4){transition-delay:.25s}
+.lcg__panel>:nth-child(5){transition-delay:.30s}
+.lcg__panel>:nth-child(6){transition-delay:.35s}
+
+@media(prefers-reduced-motion:reduce){
+  .lcg__panel,.lcg__panel>*,.lcg__media,.lcg__media img,.lcg__label{transition-duration:.01ms!important;transition-delay:0s!important}
+}

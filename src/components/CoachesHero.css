@@ -1,0 +1,37 @@
+/* COACHES  */
+.lch{position:relative;overflow:hidden;background:#0c0c0c;padding:0;
+  height:clamp(520px,82svh,900px)}
+
+.lch__media{position:absolute;inset:0;overflow:hidden}
+.lch__video{position:absolute;left:0;right:0;top:-8%;width:100%;height:116%;object-fit:cover;will-change:transform}
+.lch__media::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,20,20,.25) 0%,rgba(20,20,20,0) 40%,rgba(20,20,20,.3) 100%)}
+
+.lch__card{position:absolute;z-index:2;left:0;bottom:0;width:100%;
+  background:var(--color-paper-light,#F8F6F1);color:var(--color-ink);
+  padding:clamp(24px,3vw,44px);display:flex;flex-direction:column;align-items:flex-start;gap:16px;
+  will-change:transform}
+@media(min-width:768px){.lch__card{width:clamp(380px,38vw,600px)}}
+
+.lch__title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.01em;
+  font-size:clamp(3.4rem,7vw,6rem);line-height:.9;color:var(--color-ink)}
+.lch__mask{display:block;overflow:hidden;padding:.06em .04em .08em;margin:-.06em -.04em -.08em}
+.lch__mask>span{display:block;will-change:transform}
+
+.lch__text{font-size:clamp(1rem,1.25vw,1.2rem);line-height:1.5;font-weight:500;color:var(--color-ink);max-width:36ch}
+
+.lch__link{position:relative;display:inline-flex;align-items:center;gap:10px;
+  font-weight:800;font-size:.95rem;letter-spacing:.01em;padding-bottom:6px;color:var(--color-ink)}
+.lch__link::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--color-red);
+  transform-origin:left;transition:transform .6s var(--ease-out-expo)}
+.lch__link svg{transition:transform .5s var(--ease-out-expo)}
+.lch__link:hover svg{transform:translateX(5px)}
+.lch__link:hover::after{transform:scaleX(.35)}
+
+
+/* overwrite */
+.lch__card{background:var(--color-charcoal);color:#fff}
+.lch__title{color:#fff}
+.lch__text{color:#d9d7d1}
+.lch__link{color:#fff}

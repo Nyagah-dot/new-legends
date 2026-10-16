@@ -12,7 +12,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Props = {
   href: string;
-  /** Visible text (also the accessible name). */
+  /** Visible text */
   label: string;
   tone?: "red" | "light" | "ink" | "outline";
   size?: "sm" | "md" | "lg";
@@ -23,7 +23,7 @@ type Props = {
    */
   appear?: "intro" | "scroll" | "none";
   delay?: number;
-  /** Pull towards the cursor (fine pointers only). */
+  /** magnetic*/
   magnetic?: boolean;
   icon?: ReactNode;
   className?: string;
