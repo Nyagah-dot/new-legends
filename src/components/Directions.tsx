@@ -10,9 +10,6 @@ import "./Directions.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-/* ------------------------------------------------------------------ copy */
-/* Everything editable lives up here so the component can be re-skinned. */
-
 const BG_SRC = "/images/directions/bg.webp";
 const INLINE_SRC = "/images/directions/inline.webp";
 
@@ -30,7 +27,7 @@ const HOURS = [
 
 const DAYS = ["Today", "Tomorrow", "This weekend", "Next week"] as const;
 
-/** Google's keyless embed – swap for a Maps Embed API URL if you prefer. */
+/** Google's keyless embed  */
 const MAP_EMBED = "https://www.google.com/maps?q=The+Legends+Fitness+Links+Road+Nyali+Mombasa&output=embed";
 
 export type VisitRequest = { name: string; phone: string; when: string };
@@ -40,13 +37,14 @@ type Props = {
   onSubmit?: (data: VisitRequest) => string | void | Promise<string | void>;
 };
 
-/** Default: hand the request to WhatsApp with a pre-written message. */
+/**  pre-written message. */
 function sendViaWhatsApp({ name, phone, when }: VisitRequest): string {
-  if (!WHATSAPP_URL || WHATSAPP_URL === "#") {
+  const base = WHATSAPP_URL as string;
+  if (!base || base === "#") {
     return "WhatsApp isn’t connected yet — set WHATSAPP_URL in lib/site.ts.";
   }
   const text = `Hi, I'm ${name} (${phone}). I'd like to visit The Legends Fitness — ${when.toLowerCase()}.`;
-  const url = `${WHATSAPP_URL}${WHATSAPP_URL.includes("?") ? "&" : "?"}text=${encodeURIComponent(text)}`;
+  const url = `${base}${base.includes("?") ? "&" : "?"}text=${encodeURIComponent(text)}`;
   window.open(url, "_blank", "noopener,noreferrer");
   return `Thanks ${name.split(" ")[0]} — finish the message in WhatsApp.`;
 }

@@ -10,7 +10,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 /** *Asterisks* mark phrases that finish in the theme red. */
 const COPY =
-  "At The Legends Fitness, our coaches are not just instructors; they are the *reason you keep showing up*, and the difference between simply training and getting results.";
+  "At The Legends Fitness, our coaches are not just instructors they are the *reason you keep showing up*, and the difference between simply training and getting results.";
 
 function Words() {
   return (
