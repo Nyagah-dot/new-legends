@@ -1,11 +1,111 @@
-/* Cancellation notice above the public timetable */
-.tt-alert{border:2px solid var(--red);background:rgba(232,32,32,.12);padding:16px 20px;margin-bottom:24px;color:#fff}
-.tt-alert strong{font-family:var(--font-mono),monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
-.tt-alert ul{list-style:none;margin-top:8px;font-size:.92rem}
-.tt-alert li+li{margin-top:4px}
-.tt td>div+div{margin-top:10px}
+/* ==========================================================================
+   TIMETABLE — image + card, then a colour-coded table sheet.  Namespace .ltt
+   ========================================================================== */
+.ltt{background:var(--color-ink);color:#fff;padding:0;position:relative;scroll-margin-top:var(--header-height,70px)}
 
-/* "Try one class" box under the timetable */
-.tt-try{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;padding:20px 24px;border:2px solid #fff}
-.tt-try strong{display:block;font-size:1.15rem;color:#fff;margin-bottom:4px}
-.tt-try span{color:#c9c7c1;font-size:.95rem}
+/* ---------- image + card ---------- */
+.ltt__stage{position:relative;overflow:hidden;display:flex;align-items:center;
+  min-height:clamp(560px,92svh,880px);
+  padding:clamp(56px,9vw,120px) var(--page-gutter,clamp(20px,5vw,88px)) clamp(150px,22vw,300px)}
+.ltt__bg{position:absolute;inset:0;overflow:hidden;background:#0c0c0c}
+.ltt__bg img{position:absolute;left:0;top:-8%;width:100%;height:116%;object-fit:cover;will-change:transform}
+.ltt__bg::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,20,20,.3) 0%,rgba(20,20,20,.12) 45%,rgba(20,20,20,.55) 100%)}
+
+.ltt__card{position:relative;z-index:2;width:100%;max-width:560px;
+  background:var(--color-paper-light,#F8F6F1);color:var(--color-ink);
+  border-top:4px solid var(--color-red);
+  padding:clamp(24px,3vw,44px);display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+@media(min-width:900px){.ltt__card{margin-left:clamp(0px,8vw,160px)}}
+.ltt__card .eyebrow{color:var(--color-ink)}
+
+.ltt__title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.01em;
+  font-size:clamp(2.9rem,6vw,5rem);line-height:.92;color:var(--color-ink)}
+.ltt__mask{display:block;overflow:hidden;padding:.06em .04em .08em;margin:-.06em -.04em -.08em}
+.ltt__mask>span{display:block;will-change:transform}
+.ltt__red{color:var(--color-red)}
+.ltt__text{font-size:clamp(1rem,1.25vw,1.15rem);line-height:1.55;font-weight:500;color:var(--color-ink);max-width:42ch}
+
+/* ---------- sheet (overlaps the bottom of the image) ---------- */
+.ltt__panel{position:relative;z-index:3;
+  margin-top:calc(-1 * clamp(110px,16vw,230px));
+  padding:0 var(--page-gutter,clamp(20px,5vw,88px)) var(--section-space-compact,clamp(56px,8vw,112px))}
+.ltt__sheet{max-width:var(--container-wide,1600px);margin-inline:auto;
+  background:var(--color-charcoal);border-top:4px solid var(--color-red);
+  box-shadow:var(--shadow-floating,0 24px 80px rgb(0 0 0 / 20%));
+  padding:clamp(20px,3vw,48px)}
+
+/* cancellation notice */
+.ltt__alert{border:1px solid var(--color-red);background:rgba(232,32,32,.12);
+  padding:16px 20px;margin-bottom:24px;color:#fff}
+.ltt__alert strong{font-family:var(--font-utility),monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.ltt__alert ul{list-style:none;margin-top:8px;font-size:.92rem}
+.ltt__alert li+li{margin-top:4px}
+.ltt__empty-msg{color:#c9c7c1;font-size:1.05rem}
+
+/* ---------- table ---------- */
+.ltt__hint{display:none;font-family:var(--font-utility),monospace;font-size:.68rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--color-muted,#A8A6A0);margin-bottom:12px}
+@media(max-width:899px){.ltt__hint{display:block}}
+
+.ltt__scroll{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.25) transparent}
+.ltt__table{width:100%;min-width:780px;border-collapse:separate;border-spacing:0}
+.ltt__sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.ltt__table thead th{padding:0 10px 16px;text-align:center;
+  font-family:var(--font-body),system-ui,sans-serif;font-weight:800;font-size:.72rem;
+  letter-spacing:.14em;text-transform:uppercase;color:#fff;
+  border-bottom:1px solid rgba(255,255,255,.18)}
+
+/* time column stays put while the days scroll */
+.ltt__time{position:sticky;left:0;z-index:1;background:var(--color-charcoal);
+  text-align:left;white-space:nowrap;padding:24px 18px 24px 0;
+  font-family:var(--font-utility),monospace;font-weight:700;font-size:.82rem;letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;color:#fff;vertical-align:middle}
+.ltt__table thead .ltt__time{text-align:left;color:var(--color-muted,#A8A6A0)}
+
+/* the sticky time cell needs its own divider or the row lines break at the left edge */
+.ltt__table tbody .ltt__time{border-bottom:1px solid rgba(255,255,255,.08)}
+.ltt__table tbody tr:last-child .ltt__time,.ltt__table tbody tr:last-child .ltt__cell{border-bottom:0}
+
+/* today's column (Nairobi time) */
+.ltt__table thead th.ltt__today{color:var(--color-red-soft);border-bottom-color:var(--color-red);box-shadow:inset 0 3px 0 var(--color-red)}
+.ltt__cell--today{background:rgba(232,32,32,.07)}
+.ltt__cell--today:hover{background:rgba(232,32,32,.12)}
+
+.ltt__scroll:focus-visible{outline:2px solid var(--color-red);outline-offset:4px}
+
+.ltt__cell{padding:24px 10px;text-align:center;vertical-align:top;
+  border-bottom:1px solid rgba(255,255,255,.08);transition:background .4s var(--ease-out-expo,ease)}
+.ltt__cell:hover{background:rgba(255,255,255,.04)}
+.ltt__cell--empty{color:rgba(255,255,255,.18);vertical-align:middle}
+
+.ltt__class{display:flex;flex-direction:column;align-items:center;gap:5px}
+.ltt__class+.ltt__class{margin-top:16px}
+.ltt__name{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;font-size:1.55rem;line-height:1;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--tone,#fff);transition:letter-spacing .5s var(--ease-out-expo,ease)}
+.ltt__cell:hover .ltt__name{letter-spacing:.075em}
+.ltt__coach{font-family:var(--font-utility),monospace;font-size:.64rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--color-muted,#A8A6A0)}
+.ltt__tag{margin-top:2px;padding:2px 7px;background:var(--color-red);color:#fff;
+  font-family:var(--font-utility),monospace;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+/* legend + notes */
+.ltt__legend{list-style:none;display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:26px;
+  font-family:var(--font-utility),monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:#c9c7c1}
+.ltt__legend li{display:inline-flex;align-items:center;gap:8px}
+.ltt__legend li::before{content:"";width:10px;height:10px;background:var(--tone,#fff)}
+.ltt__note{margin-top:14px;font-family:var(--font-utility),monospace;font-size:.7rem;color:var(--color-muted,#A8A6A0);
+  display:flex;align-items:center;gap:9px}
+.ltt__note::before{content:"";flex:none;width:10px;height:10px;background:var(--color-red)}
+
+/* "try one class" bar */
+.ltt__try{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  margin-top:clamp(28px,4vw,48px);padding-top:clamp(24px,3vw,36px);border-top:1px solid rgba(255,255,255,.14)}
+.ltt__try strong{display:block;margin-bottom:6px;
+  font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;font-weight:400;
+  font-size:clamp(1.8rem,3vw,2.6rem);line-height:1;letter-spacing:.01em;text-transform:uppercase;color:#fff}
+.ltt__try span{color:#c9c7c1;font-size:.98rem}

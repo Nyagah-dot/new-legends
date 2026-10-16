@@ -39,7 +39,8 @@ export default function Home() {
         {/* <Steps /> */}
         <Tour />
         <Coaches />
-        <Testimonials />
+        {/* <Testimonials /> */}
+        <Timetable /> 
         <Pricing />
         <Location />
         <FinalCta />
