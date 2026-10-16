@@ -1,5 +1,7 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import PostHero from "@/components/PostHero";
+import PostHeroGrid from "@/components/PostHeroGrid";
 import Why from "@/components/Why";
 import Timetable from "@/components/Timetable";
 import Steps from "@/components/Steps";
@@ -10,7 +12,8 @@ import Pricing from "@/components/Pricing";
 import Location from "@/components/Location";
 import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
-import RevealObserver from "@/components/RevealObserver";
+import PageWipe from "@/components/PageWipe";
+import SmoothScroll from "@/components/SmoothScroll";
 
 // The timetable comes from the database and is read fresh on every visit,
 // so changes made in Admin -> Classes appear straight away.
@@ -19,10 +22,14 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <>
+      <PageWipe />
+      <SmoothScroll />
       <a href="#main" className="skip">Skip to content</a>
       <Nav />
       <main id="main">
         <Hero />
+        <PostHero />
+        <PostHeroGrid />
         <Why />
         <Timetable />
         <Steps />
@@ -34,7 +41,6 @@ export default function Home() {
         <FinalCta />
       </main>
       <Footer />
-      <RevealObserver />
     </>
   );
 }

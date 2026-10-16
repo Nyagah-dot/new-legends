@@ -1,0 +1,28 @@
+/* ==========================================================================
+   SectionHeader — reusable animated section title (eyebrow + masked words
+   + optional hairline). Parent supplies padding / margins via className.
+   Override size with --sh-size, accent with --sh-accent.
+   ========================================================================== */
+.sh{--sh-size:clamp(2.6rem,min(13vw,10svh),5.4rem);--sh-accent:var(--color-red,#E82020);
+  --sh-fg:#fff;--sh-rule:rgb(255 255 255 / 18%);display:block}
+.sh--light{--sh-fg:var(--color-ink,#141414);--sh-rule:rgb(20 20 20 / 18%)}
+.sh--lg{--sh-size:clamp(3rem,10vw,9rem)}
+.sh--center{text-align:center}
+.sh--center .sh__eyebrow{justify-content:center}
+
+.sh__eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  font-family:var(--font-utility),monospace;font-size:var(--text-xs,.75rem);font-weight:700;
+  letter-spacing:var(--tracking-wide,.12em);line-height:1.4;text-transform:uppercase;color:var(--sh-fg)}
+.sh__tick{flex:none;width:8px;height:8px;background:var(--sh-accent)}
+.sh__eyebrow b{color:var(--sh-accent);font-weight:700}
+
+.sh__title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.005em;
+  font-size:var(--sh-size);line-height:.92;color:var(--sh-fg)}
+.sh__mask{display:block;overflow:hidden;padding:.07em .04em .09em;margin:-.07em -.04em -.09em}
+.sh__mask--accent{color:var(--sh-accent)}
+.sh__word{display:inline-block;will-change:transform}
+
+.sh__rule{display:block;height:1px;margin-top:clamp(18px,2.4vw,32px);background:var(--sh-rule)}
+
+@media (min-width:900px){.sh{--sh-size:clamp(2.6rem,min(5.4vw,9svh),5.4rem)}.sh--lg{--sh-size:clamp(3rem,9vw,9rem)}}

@@ -1,0 +1,109 @@
+
+/* THE LEGENDS — SINGLE PANEL PAGE WIPE */
+
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-wipe, 9999);
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+  padding: var(--page-gutter, clamp(20px, 5vw, 88px));
+
+  /* One solid brand-colored panel */
+ background: #A61919;
+  color: #FFFFFF;
+
+  pointer-events: none;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Centered brand lockup */
+
+.wipe__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Text reveal masks */
+
+.wipe__mask {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+.wipe__brand {
+  display: block;
+
+  font-family:
+    var(--font-condensed),
+    "League Gothic",
+    Impact,
+    "Arial Narrow",
+    sans-serif;
+
+  font-size: clamp(2.6rem, 12vw, 6rem);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 0.92;
+
+  letter-spacing: 0.03em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+
+       color: #FFFFFF;
+  text-shadow: none;
+}
+
+.wipe__sub {
+  display: block;
+  margin-top: 18px;
+
+  font-family: var(--font-utility), monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+
+  /* Same red palette, slightly softened */
+  /* color: rgb(255 255 255 / 78%); */
+   color: #FFFFFF;
+  opacity: 0.9;
+}
+
+/* Smaller screens */
+
+@media (max-width: 480px) {
+  .wipe__brand {
+    font-size: clamp(2.2rem, 11vw, 3.5rem);
+    white-space: normal;
+  }
+
+  .wipe__sub {
+    margin-top: 14px;
+    font-size: 0.62rem;
+  }
+}
+
+/* Respect reduced motion even before JS runs */
+
+@media (prefers-reduced-motion: reduce) {
+  .wipe {
+    will-change: auto;
+  }
+}
