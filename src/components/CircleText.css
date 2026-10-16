@@ -38,6 +38,7 @@
   border-radius: 50%;
 
   background: var(--ct-bg);
+  border: 2px #e82020;
   color: #ffffff;
   text-decoration: none;
 

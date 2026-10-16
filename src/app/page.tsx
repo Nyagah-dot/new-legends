@@ -14,6 +14,9 @@ import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
 import PageWipe from "@/components/PageWipe";
 import SmoothScroll from "@/components/SmoothScroll";
+import Improv from "@/components/Improv";
+
+
 
 // The timetable comes from the database and is read fresh on every visit,
 // so changes made in Admin -> Classes appear straight away.
@@ -31,11 +34,13 @@ export default function Home() {
         <PostHero />
         <PostHeroGrid />
         <Why />
-        <Timetable />
-        <Steps />
+        <Improv />      
+        {/* <Timetable /> */}
+        {/* <Steps /> */}
         <Tour />
         <Coaches />
-        <Testimonials />
+        {/* <Testimonials /> */}
+        <Timetable /> 
         <Pricing />
         <Location />
         <FinalCta />
