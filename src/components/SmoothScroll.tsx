@@ -8,10 +8,7 @@ import { headerOffset, onIntro, setLenis } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * The ONE scroll engine: Lenis driven by the GSAP ticker, kept in sync with ScrollTrigger.
- * Mount once, in src/app/page.tsx (marketing page only — member/admin/desk pages keep native scroll).
- * Renders nothing. Scroll is locked until the page wipe clears.
+/* scroll engine: Lenis driven by the GSAP ticker
  */
 export default function SmoothScroll() {
   useEffect(() => {
@@ -37,12 +34,12 @@ export default function SmoothScroll() {
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
 
-    // Lock scroll during the intro wipe (safety net so it can never stay locked).
+    // Lock scroll during the intro 
     lenis.stop();
     const off = onIntro(() => lenis.start());
     const safety = window.setTimeout(() => lenis.start(), 4000);
 
-    // Same-page anchor links (e.g. "/#classes") glide, offset by the header height.
+    // Same-page anchor links 
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = (e.target as Element | null)?.closest?.("a[href*='#']") as HTMLAnchorElement | null;
