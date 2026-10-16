@@ -4,7 +4,7 @@
 export const TIMETABLE_HREF = "/#classes";
 
 /** TODO: wire the real WhatsApp link, e.g. https://wa.me/254XXXXXXXXX */
-export const WHATSAPP_URL = "#";
+export const WHATSAPP_URL: string = "#";
 
 /** TODO: wire real socials later. */
 export const SOCIALS: { label: string; href: string }[] = [];
