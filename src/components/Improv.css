@@ -1,0 +1,42 @@
+/* ==========================================================================
+   IMPROV — video box, side circle (text), overlapping CTA circle. .limp
+   Mobile: circle overlaps the top-left corner. Desktop: circle sits beside
+   the video and overlaps its left edge. CTA always straddles the bottom edge.
+   ========================================================================== */
+.limp{--limp-cta:clamp(120px,32vw,200px);--limp-circle:clamp(150px,44vw,420px);
+  position:relative;overflow:clip;background:#000;color:#fff;
+  padding-top:calc(var(--section-space-compact,clamp(56px,8vw,112px)) + var(--limp-circle)*.3);
+  padding-bottom:calc(var(--section-space-compact,clamp(56px,8vw,112px)) + var(--limp-cta)*.5)}
+
+.limp__stage{position:relative;max-width:var(--container-wide,1600px);margin-inline:auto;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px))}
+
+/* ---- video box ---- */
+.limp__frame{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;
+  border-radius:var(--radius-lg,18px);background:#0b0b0b;z-index:1}
+.limp__zoom{position:absolute;inset:0;will-change:transform}
+.limp__media{position:absolute;left:0;top:-8%;width:100%;height:116%;object-fit:cover;
+  will-change:transform;pointer-events:none}
+
+/* ---- side circle ---- */
+.limp__circle{position:absolute;z-index:2;width:var(--limp-circle);
+  left:calc(var(--page-gutter,20px) - 4vw);top:calc(var(--limp-circle)*-.3)}
+
+.limp__circle .ct__disc{box-shadow:inset 0 0 0 1px rgb(255 255 255 / 16%)} /* ring so the black disc reads on black */
+
+/* ---- CTA circle (straddles the bottom edge) ---- */
+.limp__cta{position:absolute;z-index:3;right:calc(var(--page-gutter,20px) + 6%);
+  bottom:calc(var(--limp-cta)*-.5)}
+.limp__plus{display:inline-block;font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-size:calc(var(--cc-size)*.17);line-height:1;letter-spacing:.04em;
+  transition:transform .55s var(--ease-out-expo,cubic-bezier(.16,1,.3,1))}
+.cc__body:hover .limp__plus,.cc__body:focus-visible .limp__plus{transform:rotate(90deg)}
+
+/* ---- desktop ---- */
+@media (min-width:900px){
+  .limp{--limp-cta:clamp(150px,14vw,210px);--limp-circle:clamp(260px,28vw,420px);
+    padding-top:var(--section-space-compact,clamp(56px,8vw,112px))}
+  .limp__frame{width:76%;margin-left:auto;aspect-ratio:16/9}
+  .limp__circle{left:var(--page-gutter,20px);top:8%;width:var(--limp-circle)}
+  .limp__cta{right:calc(var(--page-gutter,20px) + 10%)}
+}
