@@ -1,0 +1,105 @@
+/*WHY THE LEGENDS — horizontal card rail (Gymbox-style), namespaced  */
+.lwhy{
+  --lwhy-gap:clamp(12px,1.4vw,20px);
+  position:relative;overflow:clip;background:#000;color:#fff;
+  padding-block:var(--section-space-compact,clamp(56px,8vw,112px));
+  scroll-margin-top:var(--header-height,70px);
+}
+
+/* ---- head ---- */
+.lwhy__head{display:grid;gap:20px;align-items:end;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px));margin-bottom:clamp(28px,4vw,56px)}
+.lwhy__eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;
+  font-family:var(--font-utility),monospace;font-size:var(--text-xs,.75rem);font-weight:700;
+  letter-spacing:var(--tracking-wide,.12em);text-transform:uppercase;color:#fff}
+.lwhy__eyebrow::before{content:"";width:8px;height:8px;background:var(--color-red,#E82020)}
+.lwhy__eyebrow b{color:var(--color-red,#E82020);font-weight:700}
+
+.lwhy__title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.005em;
+  font-size:clamp(2.6rem,min(13vw,10svh),5.4rem);line-height:.92;text-wrap:nowrap;color:#fff}
+.lwhy__mask{display:block;overflow:hidden;padding:.07em .04em .09em;margin:-.07em -.04em -.09em}
+.lwhy__mask--red{color:var(--color-red,#E82020)}
+.lwhy__line{display:inline-block;will-change:transform}
+.lwhy__lead{max-width:38ch;color:var(--color-muted,#A8A6A0);font-size:clamp(.95rem,1.2vw,1.1rem);line-height:1.55}
+
+@media (min-width:900px){
+  .lwhy__head{grid-template-columns:1fr auto;gap:48px}
+  .lwhy__title{font-size:clamp(2.6rem,min(5.4vw,9svh),5.4rem)}
+  .lwhy__lead{padding-bottom:.6em}
+}
+@media (max-width:480px){.lwhy__title{text-wrap:balance}.lwhy__line{white-space:normal}}
+
+/* ---- rail (native scroller by default) ---- */
+.lwhy__rail{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;scrollbar-width:none;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px));
+  scroll-padding-inline:var(--page-gutter,20px)}
+.lwhy__rail::-webkit-scrollbar{display:none}
+.lwhy__rail:focus-visible{outline-offset:-3px}
+.lwhy__track{display:flex;gap:var(--lwhy-gap);width:max-content;will-change:transform}
+
+/* ---- card ---- */
+.lwhy__card{position:relative;flex:none;overflow:hidden;isolation:isolate;
+  width:min(78vw,340px);aspect-ratio:3/4.3;scroll-snap-align:start;
+  border-radius:var(--radius-lg,18px);background:var(--color-charcoal,#1E1E1E);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(16px,2vw,24px)}
+.lwhy__media{position:absolute;inset:0;z-index:-2;transition:transform 1.1s var(--ease-out-expo,cubic-bezier(.16,1,.3,1))}
+.lwhy__media img{width:100%;height:100%;max-width:none;object-fit:cover;will-change:transform;user-select:none}
+.lwhy__card::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgb(0 0 0 / 28%) 0%,rgb(0 0 0 / 0%) 32%,rgb(0 0 0 / 88%) 100%)}
+.lwhy__card::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:100%;
+  background:var(--color-red,#E82020);transform:scaleX(0);transform-origin:left;
+  transition:transform .7s var(--ease-out-expo,cubic-bezier(.16,1,.3,1))}
+
+.lwhy__num{position:absolute;top:clamp(14px,1.6vw,20px);left:clamp(16px,2vw,24px);
+  font-family:var(--font-utility),monospace;font-size:.72rem;font-weight:700;letter-spacing:.12em;color:#fff}
+
+.lwhy__card-title{font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;letter-spacing:.01em;
+  font-size:clamp(2.1rem,3.3vw,3.1rem);line-height:.92;color:#fff;text-wrap:balance}
+.lwhy__desc{display:grid;grid-template-rows:1fr}
+.lwhy__desc p{overflow:hidden;min-height:0;margin-top:12px;color:rgb(255 255 255 / 80%);
+  font-size:.92rem;line-height:1.5;max-width:30ch}
+
+/* fine pointers: description folds away until hover (touch always shows it) */
+@media (hover:hover) and (pointer:fine){
+  .lwhy__desc{grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease-out-expo,cubic-bezier(.16,1,.3,1))}
+  .lwhy__desc p{margin-top:0;transition:margin-top .6s var(--ease-out-expo,cubic-bezier(.16,1,.3,1))}
+  .lwhy__card:hover .lwhy__desc,.lwhy__card:focus-within .lwhy__desc{grid-template-rows:1fr}
+  .lwhy__card:hover .lwhy__desc p,.lwhy__card:focus-within .lwhy__desc p{margin-top:12px}
+  .lwhy__card:hover .lwhy__media{transform:scale(1.06)}
+  .lwhy__card:hover::after{transform:scaleX(1)}
+}
+
+/* ---- closing CTA card ---- */
+.lwhy__card--cta{background:var(--color-red,#E82020);justify-content:space-between;align-items:flex-start}
+.lwhy__card--cta::before,.lwhy__card--cta::after{display:none}
+.lwhy__cta-copy p{margin-top:12px;color:rgb(255 255 255 / 88%);font-size:.92rem;line-height:1.5;max-width:24ch}
+.lwhy__cta-btn{align-self:flex-end}
+
+/* ---- foot (hint + progress) ---- */
+.lwhy__foot{display:flex;align-items:center;gap:20px;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px));margin-top:clamp(18px,2.4vw,32px)}
+.lwhy__hint{display:inline-flex;align-items:center;gap:10px;flex:none;
+  font-family:var(--font-utility),monospace;font-size:.72rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--color-muted,#A8A6A0)}
+.lwhy__hint i{font-style:normal;color:var(--color-red,#E82020)}
+.lwhy__hint [data-when="pin"]{display:none}
+.lwhy__progress{display:none;position:relative;flex:1;height:2px;background:rgb(255 255 255 / 18%);overflow:hidden}
+.lwhy__bar{position:absolute;inset:0;background:var(--color-red,#E82020);transform:scaleX(0);transform-origin:left}
+
+/* ---- pinned desktop mode (class added by JS) ---- */
+.lwhy.is-pinned{min-height:calc(100svh - var(--header-height,70px));
+  display:flex;flex-direction:column;justify-content:center;
+  padding-block:clamp(24px,4svh,48px)}
+.lwhy.is-pinned .lwhy__head{margin-bottom:clamp(20px,3.5svh,40px)}
+.lwhy.is-pinned .lwhy__rail{overflow:visible;scroll-snap-type:none}
+.lwhy.is-pinned .lwhy__card{--h:min(52svh,560px);height:var(--h);width:calc(var(--h) * .74);aspect-ratio:auto}
+.lwhy.is-pinned .lwhy__foot{margin-top:clamp(16px,3svh,32px)}
+.lwhy.is-pinned .lwhy__progress{display:block}
+.lwhy.is-pinned [data-when="native"]{display:none}
+.lwhy.is-pinned [data-when="pin"]{display:inline}
+
+/* tablets: a bit bigger cards in the native scroller */
+@media (min-width:640px) and (max-width:899px){.lwhy__card{width:min(44vw,360px)}}
