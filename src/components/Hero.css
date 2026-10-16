@@ -1,44 +1,51 @@
-/* HERO — split headline over a rising video $ circular  */
-.lhero{--cta:clamp(108px,30vw,164px);
-  position:relative;isolation:isolate;overflow:hidden;background:var(--color-ink);color:#fff;
-  padding-block:clamp(28px,6vh,72px) 0}
+/* HERO  */
+.lhero{
+  /* condensed display  */
+  --hero-font: var(--font-condensed), "League Gothic", Impact, "Arial Narrow", sans-serif;
+  --overlap: .4;                       /* share of line 2's height that dips over the video */
+  --cta: clamp(112px,30vw,196px);      /* circle CTA diameter */
 
-.lhero__gutter{width:100%;max-width:var(--container-wide);margin-inline:auto;padding-inline:var(--page-gutter)}
+  position:relative;isolation:isolate;overflow:hidden;
+  background:var(--color-ink);color:#fff;
+  padding-block:clamp(56px,12vh,130px) 0;
+}
 
-/* headline: two halves*/
-.lhero__top{position:relative;z-index:3}
-.lhero .eyebrow{color:#fff;margin-bottom:clamp(14px,2.4vh,24px)}
-.lhero__title{font-size:clamp(2.9rem,12.5vw,6.4rem);line-height:.9;letter-spacing:-.035em;
-  font-weight:800;text-transform:uppercase;color:#fff;margin-bottom:-.46em;pointer-events:none}
-.lhero__row{display:flex;flex-wrap:wrap;column-gap:.22em;will-change:transform}
-.lhero__row--b{justify-content:flex-end}
-.lhero__mask{display:block;overflow:hidden;padding:.05em .06em .1em;margin:-.05em -.06em -.1em}
-.lhero__line{display:block;will-change:transform}
-.lhero__title .serif{font-size:1.1em;letter-spacing:-.01em;line-height:.9}
+/*  headline  */
+.lhero__top{position:relative;z-index:3;padding-inline:var(--page-gutter);text-align:center}
+.lhero__title{
+  font-family:var(--hero-font);font-weight:400;font-synthesis:none;
+  font-size:20vw;line-height:.88;letter-spacing:.005em;text-transform:uppercase;
+  color:#fff;text-wrap:nowrap;pointer-events:none;
+  margin-bottom:calc(var(--overlap) * -.88em);
+}
+@media(min-width:640px){.lhero__title{font-size:15.5vw}}
+@media(min-width:1024px){.lhero__title{font-size:min(12.8vw,15rem)}}
 
-/* video stage*/
+.lhero__line{display:block}
+.lhero__line--b{color:var(--color-red)}
+
+/* line 1 */
+.lhero__split{position:relative;display:inline-block}
+.lhero__base{display:block;color:transparent;white-space:nowrap}
+.lhero__half{position:absolute;inset:0;display:block;white-space:nowrap;color:#fff;will-change:transform}
+.lhero__half--top{clip-path:inset(0 0 49.5% 0)}   /* 0.5% overlap hides the hairline seam */
+.lhero__half--bot{clip-path:inset(50% 0 0 0)}
+
+/* line 2 */
+.lhero__mask{display:block;overflow:hidden;padding:.06em .04em .08em;margin:-.06em -.04em -.08em}
+.lhero__rise{display:block;will-change:transform}
+
+/* video */
 .lhero__stage{position:relative;z-index:1}
-.lhero__media{position:relative;overflow:hidden;background:#0c0c0c;
-  height:clamp(320px,58svh,560px)}
+.lhero__media{position:relative;overflow:hidden;background:#0c0c0c;height:clamp(420px,88svh,980px)}
 .lhero__media .ph{position:absolute;inset:0;min-height:0;border:0;padding:0;
   justify-content:flex-start;align-items:flex-start}
 .lhero__video{position:absolute;left:0;right:0;top:-10%;width:100%;height:120%;
   object-fit:cover;will-change:transform}
-
-
+/* red line */
 .lhero__media::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(20,20,20,.72) 0%,rgba(20,20,20,0) 46%),
-             linear-gradient(0deg,rgba(20,20,20,.35) 0%,rgba(20,20,20,0) 30%)}
+  background:linear-gradient(180deg,rgba(20,20,20,.38) 0%,rgba(20,20,20,.1) 32%,rgba(20,20,20,.2) 100%)}
 
-/* ---- foot circle CTA  */
-.lhero__foot{position:relative;z-index:var(--z-cta);display:grid;grid-template-columns:1fr auto;
-  column-gap:clamp(16px,4vw,48px);align-items:start;padding-bottom:clamp(40px,7vw,96px)}
-.lhero__lead{grid-column:1;grid-row:1;max-width:46ch;padding-top:clamp(18px,3vw,32px);
-  color:#c9c7c1;font-size:1rem;font-weight:500;text-transform:none}
-.lhero__cta{grid-column:2;grid-row:1;margin-top:calc(var(--cta) * -.5)}
-
-@media(min-width:900px){
-  .lhero__title{font-size:clamp(4.5rem,8vw,8rem)}
-  .lhero__media{height:clamp(380px,60svh,760px)}
-  .lhero__lead{font-size:1.15rem}
-}
+/* circle CTA */
+.lhero__cta{position:absolute;z-index:3;right:var(--page-gutter);bottom:clamp(20px,5vw,64px)}
+@media(min-width:1024px){.lhero{--cta:clamp(170px,14vw,240px)}}

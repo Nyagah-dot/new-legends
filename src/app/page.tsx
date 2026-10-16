@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import PostHero from "@/components/PostHero";
 import Why from "@/components/Why";
 import Timetable from "@/components/Timetable";
 import Steps from "@/components/Steps";
@@ -26,6 +27,7 @@ export default function Home() {
       <Nav />
       <main id="main">
         <Hero />
+        <PostHero />
         <Why />
         <Timetable />
         <Steps />

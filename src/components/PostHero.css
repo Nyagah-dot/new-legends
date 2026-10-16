@@ -1,0 +1,36 @@
+/* ==========================================================================
+   POST-HERO — "Membership with ✦ best benefits"
+   Two rows of ultra-condensed type: row A left, row B right with a sparkle
+   and the highlighted phrase in the theme red. Namespaced .lpost.
+   ========================================================================== */
+.lpost{
+  background:var(--color-ink);color:#fff;
+  padding-block:var(--section-space,clamp(88px,12vw,176px));
+  overflow:hidden;
+}
+.lpost__inner{width:100%;max-width:var(--container-wide,1600px);margin-inline:auto;
+  padding-inline:var(--page-gutter,clamp(20px,5vw,88px))}
+
+.lpost__title{
+  /* fallback until the fit script measures the real font; JS overwrites this */
+  font-size:calc((100vw - 2 * var(--page-gutter,20px)) * .15);
+  font-family:var(--font-condensed),"League Gothic",Impact,"Arial Narrow",sans-serif;
+  font-weight:400;font-synthesis:none;text-transform:uppercase;
+  line-height:.9;letter-spacing:.005em;text-wrap:nowrap;color:#fff;
+}
+
+.lpost__row{display:flex;align-items:center;gap:.16em;width:max-content;white-space:nowrap}
+.lpost__row--b{margin-left:auto}
+
+/* masks hide each word / letter until it rises into place */
+.lpost__mask{display:inline-flex;overflow:hidden;vertical-align:top;
+  padding:.07em .04em .09em;margin:-.07em -.04em -.09em}
+.lpost__word,.lpost__ch{display:inline-block;will-change:transform}
+
+/* highlighted phrase */
+.lpost__mask--hl{color:var(--color-red)}
+.lpost__sp{display:inline-block;width:.2em}
+
+/* sparkle */
+.lpost__star{flex:none;width:.62em;height:.62em;color:#fff;
+  filter:drop-shadow(0 0 .12em rgba(255,255,255,.35));will-change:transform}

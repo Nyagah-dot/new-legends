@@ -1,9 +1,105 @@
-.wipe{position:fixed;inset:0;z-index:var(--z-wipe);pointer-events:none}
-.wipe__panel{position:absolute;inset:0;will-change:transform}
-.wipe__panel--red{background:var(--color-red)}
-.wipe__panel--ink{background:var(--color-ink);color:#fff;display:grid;place-items:center;padding:var(--page-gutter)}
-.wipe__mask{display:block;overflow:hidden;padding-block:.12em;margin-block:-.12em}
-.wipe__brand{display:block;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-  font-size:clamp(1.05rem,4.2vw,1.7rem);text-align:center;white-space:nowrap}
-.wipe__sub{display:block;margin-top:14px;font-family:var(--font-utility),monospace;font-size:.68rem;
-  letter-spacing:.14em;text-transform:uppercase;color:#a8a6a0;text-align:center}
+
+/* ========================================
+   THE LEGENDS — SINGLE PANEL PAGE WIPE
+======================================== */
+
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-wipe, 9999);
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+  padding: var(--page-gutter, clamp(20px, 5vw, 88px));
+
+  /* One solid brand-colored panel */
+  background: var(--color-red, #e82020);
+  color: #fff;
+
+  pointer-events: none;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Centered brand lockup */
+
+.wipe__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Text reveal masks */
+
+.wipe__mask {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+.wipe__brand {
+  display: block;
+
+  font-family:
+    var(--font-condensed),
+    "League Gothic",
+    Impact,
+    "Arial Narrow",
+    sans-serif;
+
+  font-size: clamp(2.6rem, 12vw, 6rem);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 0.92;
+
+  letter-spacing: 0.03em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wipe__sub {
+  display: block;
+  margin-top: 18px;
+
+  font-family: var(--font-utility), monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+
+  /* Same red palette, slightly softened */
+  color: rgb(255 255 255 / 78%);
+}
+
+/* Smaller screens */
+
+@media (max-width: 480px) {
+  .wipe__brand {
+    font-size: clamp(2.2rem, 11vw, 3.5rem);
+    white-space: normal;
+  }
+
+  .wipe__sub {
+    margin-top: 14px;
+    font-size: 0.62rem;
+  }
+}
+
+/* Respect reduced motion even before JS runs */
+
+@media (prefers-reduced-motion: reduce) {
+  .wipe {
+    will-change: auto;
+  }
+}

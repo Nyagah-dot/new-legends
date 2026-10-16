@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -11,13 +11,17 @@ import "./Hero.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-
-function Line({ children, className = "" }: { children: ReactNode; className?: string }) {
+/**
+ * One line of type cut across its middle: the top half and bottom half are
+ * separate layers that slide apart. The transparent base keeps the layout
+ * width and is the only copy screen readers get.
+ */
+function SplitLine({ text }: { text: string }) {
   return (
-    <span className="lhero__mask">
-      <span className={`lhero__line ${className}`.trim()} data-line>
-        {children}
-      </span>
+    <span className="lhero__split">
+      <span className="lhero__base">{text}</span>
+      <span className="lhero__half lhero__half--top" data-half="top" aria-hidden="true">{text}</span>
+      <span className="lhero__half lhero__half--bot" data-half="bot" aria-hidden="true">{text}</span>
     </span>
   );
 }
@@ -31,13 +35,11 @@ export default function Hero() {
       if (!el) return;
       const $ = gsap.utils.selector(el);
 
-      const lines = $("[data-line]");
-      const fades = $("[data-fade]");
+      const tops = $("[data-half='top']");
+      const bots = $("[data-half='bot']");
+      const rise = $("[data-rise]");
       const media = $(".lhero__media")[0] as HTMLElement;
       const video = $(".lhero__video")[0] as HTMLVideoElement | undefined;
-      const cta = $("[data-cta]");
-      const rowA = $(".lhero__row--a");
-      const rowB = $(".lhero__row--b");
 
       const mm = gsap.matchMedia();
       mm.add(
@@ -45,26 +47,31 @@ export default function Hero() {
         (ctx) => {
           const { still } = ctx.conditions as { still: boolean };
           if (still) {
-            video?.pause(); // reduced motion: everything stays visible
+            video?.pause(); // reduced motion: static hero, video holds its first frame
+            return;
           }
 
-          /*  initial (hidden) state  */
-          gsap.set(lines, { yPercent: 118 });
-          gsap.set(fades, { autoAlpha: 0, y: 24 });
+          /* ---- hidden start state (PageWipe is covering the screen) ---- */
+          gsap.set(tops, { xPercent: -18, autoAlpha: 0 });
+          gsap.set(bots, { xPercent: 18, autoAlpha: 0 });
+          gsap.set(rise, { yPercent: 118 });
           gsap.set(media, { clipPath: "inset(100% 0% 0% 0%)" });
-          gsap.set(video, { scale: 1.35 });
-          gsap.set(cta, { scale: 0, rotate: -90 });
+          if (video) gsap.set(video, { scale: 1.35 });
 
           /* ---- intro: plays when the wipe is about half cleared ---- */
           const tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
-          tl.to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.inOut" }, 0)
-            .to(video, { scale: 1, duration: 1.9 }, 0.1)
-            .to(lines, { yPercent: 0, duration: 1.25, stagger: 0.1 }, 0.25)
-            .to(fades, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08 }, 0.7)
-            .to(cta, { scale: 1, rotate: 0, duration: 1.2, ease: "elastic.out(1,.6)" }, 1.0);
+          tl.to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.inOut" }, 0);
+          if (video) tl.to(video, { scale: 1, duration: 1.9 }, 0.1);
+          tl.to([...tops, ...bots], { xPercent: 0, autoAlpha: 1, duration: 1.5 }, 0.25) // halves converge
+            .to(rise, { yPercent: 0, duration: 1.2 }, 0.6); // orange line rises through its mask
           const off = onIntro(() => tl.play());
 
-          /* scroll: video parallax */
+          /* ---- scroll: the two halves of line 1 slide apart ---- */
+          const st = () => ({ trigger: el, start: "top top", end: "bottom top", scrub: 0.6 });
+          gsap.to(tops, { x: "-8vw", ease: "none", scrollTrigger: st() });
+          gsap.to(bots, { x: "8vw", ease: "none", scrollTrigger: st() });
+
+          /* ---- scroll: video parallax, paused when off-screen ---- */
           if (video) {
             gsap.fromTo(
               video,
@@ -85,15 +92,12 @@ export default function Hero() {
               },
             });
           }
-          const drift = { ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.6 } };
-          gsap.to(rowA, { xPercent: -6, ...drift });
-          gsap.to(rowB, { xPercent: 6, ...drift });
 
           return () => off();
         }
       );
 
-      // Fonts change line widths
+      // The condensed font changes line widths; re-measure once it lands.
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
     },
     { scope: root }
@@ -101,21 +105,22 @@ export default function Hero() {
 
   return (
     <section className="lhero" ref={root} id="top">
-      <div className="lhero__gutter lhero__top">
-        <p className="eyebrow" data-fade>
-          Strength &amp; conditioning &middot; Nyali, Mombasa
-        </p>
+      <div className="lhero__top">
         <h1 className="lhero__title">
-          <span className="lhero__row lhero__row--a">
-            <Line>Show up.</Line> <Line className="serif i">Get to work.</Line>
+          <span className="lhero__line lhero__line--a">
+            <SplitLine text={"It\u2019s not fitness."} />
           </span>
-          <span className="lhero__row lhero__row--b">
-            <Line>Leave</Line> <Line>tougher.</Line>
+          <span className="lhero__line lhero__line--b">
+            <span className="lhero__mask">
+              <span className="lhero__rise" data-rise>
+                It&rsquo;s life.
+              </span>
+            </span>
           </span>
         </h1>
       </div>
 
-      <div className="lhero__gutter lhero__stage">
+      <div className="lhero__stage">
         <div className="lhero__media" aria-hidden="true">
           <div className="ph dark">
             <span className="tag">VIDEO — public/videos/hero.mp4</span>
@@ -125,15 +130,10 @@ export default function Hero() {
             <source src="/videos/hero.mp4" type="video/mp4" />
           </video>
         </div>
-      </div>
 
-      <div className="lhero__gutter lhero__foot">
-        <p className="lhero__lead" data-fade>
-          Real coaching and real weight for people who want to get genuinely stronger &mdash; with a
-          proper on-ramp if you&rsquo;ve never trained a day in your life.
-        </p>
-        <div className="lhero__cta" data-cta>
-          <CircleCta href={TIMETABLE_HREF} label="Book a session" ring="Book a session" size="var(--cta)" tone="red" />
+        {/* Mounts itself (scale + opacity) once the page wipe clears. */}
+        <div className="lhero__cta">
+          <CircleCta href={TIMETABLE_HREF} label="Book a session" size="var(--cta)" appear="intro" delay={1} />
         </div>
       </div>
     </section>
