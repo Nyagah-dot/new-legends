@@ -1,6 +1,6 @@
 import type Lenis from "lenis";
 
-/** Mirrors the CSS tokens in styles/tokens.css */
+/** from  CSS tokens in global styles */
 export const EASE = {
   out: "expo.out",
   inOut: "expo.inOut",
@@ -9,14 +9,14 @@ export const EASE = {
 
 export const DUR = { fast: 0.2, med: 0.5, slow: 1.1 } as const;
 
-/** Sticky-nav height, read from --header-height in globals.css (single source of truth). */
+/** Sticky-nav height */
 export function headerOffset(): number {
   if (typeof window === "undefined") return 70;
   const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
   return Number.isFinite(v) ? v : 70;
 }
 
-/* ---------- intro handshake: PageWipe -> Hero (and later sections) ---------- */
+/*intro wipe up*/
 
 export const INTRO_EVENT = "legends:intro";
 
@@ -35,7 +35,7 @@ export function fireIntro() {
   window.dispatchEvent(new Event(INTRO_EVENT));
 }
 
-/** Run cb once the page wipe has (nearly) cleared. Fires immediately if it already has. */
+/**  cb once */
 export function onIntro(cb: () => void): () => void {
   if (typeof window === "undefined") return () => {};
   if (window.__legendsIntro) {
@@ -47,7 +47,7 @@ export function onIntro(cb: () => void): () => void {
   return () => window.removeEventListener(INTRO_EVENT, h);
 }
 
-/* ---------- shared Lenis instance ---------- */
+/*  shared Lenis instance  */
 
 let lenisRef: Lenis | null = null;
 export const setLenis = (l: Lenis | null) => {
