@@ -38,7 +38,7 @@ async function loadTimetable(): Promise<{ classes: ClassRow[] | null; cancelled:
   };
 }
 
-/** The single-class price shown in the "try a class" bar (same price as the day pass). */
+/** The single-class price shown */
 async function loadTryPrice(): Promise<number> {
   const supabase = createPublicClient();
   if (!supabase) return 1000;
@@ -58,7 +58,7 @@ function buildSlots(classes: ClassRow[]): Slot[] {
 
 const tone = (name: string) => ({ "--tone": classTone(name) }) as CSSProperties;
 
-/** Index 0..6 (Mon..Sun) of today in Nairobi, so the table can highlight the current day. */
+/** Index 0..6 (Mon..Sun) of today in Nairobi*/
 function todayColumn(): number {
   const jsDay = new Date(`${nairobiToday()}T00:00:00Z`).getUTCDay(); // 0 = Sun
   return (jsDay + 6) % 7;
@@ -72,7 +72,7 @@ export default async function Timetable() {
 
   return (
     <TimetableShell>
-      {/* ---------- image + card (the "UFC" half) ---------- */}
+   
       <div className="ltt__stage">
         <div className="ltt__bg" aria-hidden="true">
           <img src="/images/timetable/bg.webp" alt="" loading="lazy" decoding="async" />
@@ -88,8 +88,7 @@ export default async function Timetable() {
             </span>
           </h2>
           <p className="ltt__text" data-fade>
-            Open gym all day. Coached classes at set times. Drop into any session that fits &mdash; a coach is always
-            on the floor.
+            Open gym all day. Coached classes at set times. Drop into any session that fits you.
           </p>
           <div data-fade>
             <RectCta href="#timetable" label="See the timetable" tone="red" appear="none" />
@@ -97,7 +96,7 @@ export default async function Timetable() {
         </div>
       </div>
 
-      {/* ---------- the colour-coded table (the "Fitness Club" half) ---------- */}
+      {/* the colour-coded table*/}
       <div className="ltt__panel" id="timetable">
         <div className="ltt__sheet">
           {cancelled.length > 0 && (
@@ -122,7 +121,7 @@ export default async function Timetable() {
             </p>
           )}
 
-          {/* Developer-only hint (npm run dev). Never shown on the live site. */}
+          {/* Developer-only hint . */}
           {process.env.NODE_ENV !== "production" && problem && (
             <p className="ltt__note">DEV: timetable query failed: {problem}</p>
           )}
