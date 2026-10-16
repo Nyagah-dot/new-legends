@@ -19,8 +19,7 @@ export default function PageWipe() {
       const el = root.current;
       if (!el) return;
 
-      // Skip the intro if it has already played or
-      // the visitor prefers reduced motion.
+      // Skip the intro if it has already played 
       if (
         introDone() ||
         window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -48,9 +47,9 @@ export default function PageWipe() {
           ease: "expo.out",
         }
       )
-        // Let the brand settle before revealing the page.
+        //  brand settle before revealing the page.
         .to({}, { duration: 0.45 })
-        // One panel. One continuous upward wipe.
+        // One panel-continuous upward wipe.
         .to(el, {
           yPercent: -100,
           duration: 1.15,
@@ -67,7 +66,7 @@ export default function PageWipe() {
       <div className="wipe__content">
         <span className="wipe__mask">
           <span className="wipe__brand wipe__inner">
-            <Brand />
+            <Brand wipe />
           </span>
         </span>
 

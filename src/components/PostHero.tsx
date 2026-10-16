@@ -8,7 +8,7 @@ import "./PostHero.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-/** Four-point sparkle, sized in em so it scales with the headline. */
+/** 4-point sparkle*/
 function Sparkle() {
   return (
     <svg className="lpost__star" data-star viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -17,7 +17,7 @@ function Sparkle() {
   );
 }
 
-/** Every character in its own span so the highlighted phrase can animate letter by letter. */
+/** letter animation */
 function Chars({ text }: { text: string }) {
   return (
     <>
@@ -39,7 +39,7 @@ export default function PostHero() {
   const title = useRef<HTMLHeadingElement>(null);
   const rowB = useRef<HTMLSpanElement>(null);
 
-  /* ---- fit: scale the headline so the widest row fills a set share of the container ---- */
+  
   useEffect(() => {
     const t = title.current;
     const b = rowB.current;
@@ -50,7 +50,7 @@ export default function PostHero() {
       const cw = t.clientWidth;
       if (!cw) return;
       const fill = window.matchMedia("(min-width: 768px)").matches ? 0.8 : 0.96;
-      t.style.fontSize = "100px"; // measure at a known size
+      t.style.fontSize = "100px"; // known size
       const w = b.offsetWidth;
       if (!w) return;
       t.style.fontSize = `${(100 * cw * fill) / w}px`;
@@ -73,7 +73,7 @@ export default function PostHero() {
     return () => ro.disconnect();
   }, []);
 
-  /* ---- scroll-triggered mount ---- */
+  /* scroll-triggered*/
   useGSAP(
     () => {
       const el = root.current;
@@ -100,7 +100,7 @@ export default function PostHero() {
           .to(star, { scale: 1, rotate: 0, autoAlpha: 1, duration: 1.2, ease: "back.out(1.7)" }, 0.35)
           .to(chars, { yPercent: 0, rotate: 0, duration: 1.1, stagger: 0.035 }, 0.45); // "Best benefits"
 
-        // slow drift: the two rows slide towards each other as the section passes
+        // slow drift
         const drift = () => ({ trigger: el, start: "top 60%", end: "bottom top", scrub: 0.6 });
         gsap.to(rowA, { x: "5vw", ease: "none", scrollTrigger: drift() });
         gsap.to(rowBEl, { x: "-5vw", ease: "none", scrollTrigger: drift() });
