@@ -10,10 +10,7 @@ import "./PageWipe.css";
 gsap.registerPlugin(useGSAP);
 
 /**
- * Page-opening "wipe up" reveal. Server-rendered covering the screen (so there is
- * no flash of un-animated content), then two panels wipe upward. Halfway through it
- * fires the intro event that the Hero (and any later section) waits for.
- * Mount once, at the top of page.tsx.
+ * Page-opening "wipe up" reveal.
  */
 export default function PageWipe() {
   const root = useRef<HTMLDivElement>(null);
@@ -23,7 +20,7 @@ export default function PageWipe() {
       const el = root.current;
       if (!el) return;
 
-      // Reduced motion, or already played this visit (client-side nav back home): skip.
+      // Reduced motion, or already played 
       if (introDone() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         gsap.set(el, { display: "none" });
         fireIntro();
@@ -61,7 +58,7 @@ export default function PageWipe() {
           </span>
         </div>
       </div>
-      {/* If JS is off the cover must never trap the page */}
+      {/* If JS  off -cover  never traps the page */}
       <noscript>
         <style>{`.wipe{display:none}`}</style>
       </noscript>
