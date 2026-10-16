@@ -1,0 +1,3 @@
+.px__defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+/* padding gives the blocks room inside the filter region; negative margin keeps layout unchanged */
+.px{display:block;padding:.35em .4em;margin:-.35em -.4em}

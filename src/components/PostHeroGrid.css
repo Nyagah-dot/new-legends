@@ -1,0 +1,156 @@
+
+/* =========================================
+   POST-HERO — ASYMMETRICAL FITNESS GRID
+========================================= */
+
+.lgrid {
+  position: relative;
+  overflow: clip;
+
+  background: #000000;
+  color: #ffffff;
+
+  padding: 0;
+}
+
+.lgrid__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: 0;
+}
+
+/* Every tile has a predictable layout box. */
+
+.lgrid__tile {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+}
+
+/* =========================================
+   IMAGE TILES
+========================================= */
+
+.lgrid__tile--img {
+  overflow: hidden;
+  background: #111111;
+}
+
+.lgrid__tile--img img {
+  position: absolute;
+  inset: -7% 0;
+
+  display: block;
+  width: 100%;
+  height: 114%;
+
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+
+  will-change: transform;
+}
+
+/* Left image + circle */
+
+.lgrid__tile--left {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.lgrid__tile--a {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Group image spans both columns. */
+
+.lgrid__tile--right {
+  grid-column: 1 / -1;
+  grid-row: 2;
+
+  aspect-ratio: 2 / 1;
+}
+
+/* Circle beneath the group image. */
+
+.lgrid__tile--b {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+/* =========================================
+   DESKTOP COMPOSITION
+========================================= */
+
+@media (min-width: 900px) {
+  .lgrid__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    /*
+     * Each track scales with viewport width.
+     * A circle occupies one square track.
+     * The right image spans two tracks.
+     */
+    grid-auto-rows: clamp(190px, 20.5vw, 340px);
+  }
+
+  .lgrid__tile {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  .lgrid__tile--left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .lgrid__tile--a {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .lgrid__tile--right {
+    grid-column: 4 / span 2;
+    grid-row: 1;
+
+    aspect-ratio: auto;
+  }
+
+  .lgrid__tile--b {
+    grid-column: 4;
+    grid-row: 2;
+  }
+}
+
+/* =========================================
+   LARGE SCREENS
+========================================= */
+
+@media (min-width: 1500px) {
+  .lgrid__grid {
+    grid-auto-rows: min(23vw, 360px);
+  }
+}
+
+/* =========================================
+   MOBILE REFINEMENT
+========================================= */
+
+@media (max-width: 480px) {
+  .lgrid__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lgrid__tile--right {
+    aspect-ratio: 1.65 / 1;
+  }
+
+  .ct__text {
+    width: 84%;
+    font-size: 10.5cqw;
+    line-height: 1;
+  }
+}

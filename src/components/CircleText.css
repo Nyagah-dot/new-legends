@@ -1,0 +1,126 @@
+
+/* =========================================
+   REUSABLE CIRCLE + SCROLL-REVEALED TEXT
+========================================= */
+
+.ct {
+  --ct-bg: #080808;
+  --ct-fill: var(--color-red, #e82020);
+
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+.ct--ink {
+  --ct-bg: #000000;
+}
+
+.ct--charcoal {
+  --ct-bg: #080808;
+}
+
+.ct--red {
+  --ct-bg: var(--color-red, #e82020);
+  --ct-fill: #000000;
+}
+
+.ct__disc {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 50%;
+
+  background: var(--ct-bg);
+  color: #ffffff;
+  text-decoration: none;
+
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 5%);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.ct__disc--link {
+  cursor: pointer;
+}
+
+/* Red hover fill  */
+
+.ct__disc--link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  border-radius: inherit;
+  background: var(--ct-fill);
+
+  transform: translateY(101%);
+  transition: transform 650ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.ct__disc--link:hover::before,
+.ct__disc--link:focus-visible::before {
+  transform: translateY(0);
+}
+
+/*  text above the hover layer. */
+
+.ct__text {
+  position: relative;
+  z-index: 1;
+
+  width: 78%;
+  margin: 0;
+
+  color: #ffffff;
+  background: none;
+
+  font-family:
+    var(--font-condensed),
+    "League Gothic",
+    Impact,
+    "Arial Narrow",
+    sans-serif;
+
+  font-size: 11cqw;
+  font-weight: 400;
+  font-synthesis: none;
+
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  text-align: center;
+  text-transform: uppercase;
+
+  -webkit-text-fill-color: #ffffff;
+}
+
+.ct__line {
+  display: block;
+}
+
+
+
+.ct__disc--link:hover .ct__text,
+.ct__disc--link:focus-visible .ct__text {
+  color: #ffffff;
+  background: none;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.ct__disc--link:focus-visible {
+  outline: 2px solid var(--color-red, #e82020);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct__disc--link::before {
+    transition: none;
+  }
+}
