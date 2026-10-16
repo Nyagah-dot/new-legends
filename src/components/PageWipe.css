@@ -1,0 +1,9 @@
+.wipe{position:fixed;inset:0;z-index:var(--z-wipe);pointer-events:none}
+.wipe__panel{position:absolute;inset:0;will-change:transform}
+.wipe__panel--red{background:var(--color-red)}
+.wipe__panel--ink{background:var(--color-ink);color:#fff;display:grid;place-items:center;padding:var(--page-gutter)}
+.wipe__mask{display:block;overflow:hidden;padding-block:.12em;margin-block:-.12em}
+.wipe__brand{display:block;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  font-size:clamp(1.05rem,4.2vw,1.7rem);text-align:center;white-space:nowrap}
+.wipe__sub{display:block;margin-top:14px;font-family:var(--font-utility),monospace;font-size:.68rem;
+  letter-spacing:.14em;text-transform:uppercase;color:#a8a6a0;text-align:center}
