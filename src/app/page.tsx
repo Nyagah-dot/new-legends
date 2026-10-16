@@ -15,7 +15,7 @@ import Footer from "@/components/Footer";
 import PageWipe from "@/components/PageWipe";
 import SmoothScroll from "@/components/SmoothScroll";
 import Improv from "@/components/Improv";
-
+import Directions from "@/components/Directions";
 
 
 // The timetable comes from the database and is read fresh on every visit,
@@ -42,7 +42,8 @@ export default function Home() {
         {/* <Testimonials /> */}
         <Timetable /> 
         <Pricing />
-        <Location />
+          <Directions />
+        {/* <Location /> */}
         <FinalCta />
       </main>
       <Footer />
