@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "next start",
+      "optimize-video": "node scripts/optimize-video.mjs",
+
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "next build"
   },
   "engines": {
     "node": ">=22.0.0"

@@ -90,6 +90,7 @@ export default function Improv() {
               ref={video}
               className="limp__media"
               src={VIDEO_SRC}
+              poster="/videos/improv-poster.jpg"
               muted
               loop
               playsInline

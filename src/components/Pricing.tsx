@@ -62,7 +62,7 @@ export default async function Pricing() {
       {/* ---------- video header + side card + spinning starting price ---------- */}
       <div className="lpr__hero">
         <div className="lpr__media" aria-hidden="true">
-          <video className="lpr__video" autoPlay muted loop playsInline preload="metadata">
+          <video className="lpr__video" autoPlay muted loop playsInline preload="metadata" poster="/videos/pricing-poster.jpg">
             <source src="/videos/pricing.mp4" type="video/mp4" />
           </video>
         </div>

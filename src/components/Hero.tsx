@@ -122,11 +122,7 @@ export default function Hero() {
 
       <div className="lhero__stage">
         <div className="lhero__media" aria-hidden="true">
-          <div className="ph dark">
-            <span className="tag">VIDEO — public/videos/hero.mp4</span>
-          </div>
-          <video className="lhero__video" autoPlay muted loop playsInline preload="metadata">
-            <source src="/videos/hero.webm" type="video/webm" />
+          <video className="lhero__video" autoPlay muted loop playsInline preload="metadata" poster="/videos/hero-poster.jpg">
             <source src="/videos/hero.mp4" type="video/mp4" />
           </video>
         </div>

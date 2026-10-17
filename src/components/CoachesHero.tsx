@@ -68,7 +68,7 @@ export default function CoachesHero() {
   return (
     <section className="lch" id="coaches" ref={root}>
       <div className="lch__media" aria-hidden="true">
-        <video className="lch__video" autoPlay muted loop playsInline preload="metadata">
+        <video className="lch__video" autoPlay muted loop playsInline preload="metadata" poster="/videos/coachesbg-poster.jpg">
           <source src="/videos/coachesbg.mp4" type="video/mp4" />
         </video>
       </div>
