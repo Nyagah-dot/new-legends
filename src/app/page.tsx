@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <>
-      <PageWipe />
+      {/* <PageWipe /> */}
       <SmoothScroll />
       <a href="#main" className="skip">Skip to content</a>
       <Nav />
