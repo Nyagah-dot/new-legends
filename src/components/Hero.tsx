@@ -12,9 +12,7 @@ import "./Hero.css";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 /**
- * One line of type cut across its middle: the top half and bottom half are
- * separate layers that slide apart. The transparent base keeps the layout
- * width and is the only copy screen readers get.
+ * One line of type cut across its middle
  */
 function SplitLine({ text }: { text: string }) {
   return (
@@ -47,24 +45,33 @@ export default function Hero() {
         (ctx) => {
           const { still } = ctx.conditions as { still: boolean };
           if (still) {
+            el.classList.add("is-ready");
             video?.pause(); // reduced motion: static hero, video holds its first frame
             return;
           }
 
-          /* ---- hidden start state (PageWipe is covering the screen) ---- */
+          /* ---- hidden start state (set before anything is shown, so there is no flash) ---- */
           gsap.set(tops, { xPercent: -18, autoAlpha: 0 });
           gsap.set(bots, { xPercent: 18, autoAlpha: 0 });
           gsap.set(rise, { yPercent: 118 });
           gsap.set(media, { clipPath: "inset(100% 0% 0% 0%)" });
           if (video) gsap.set(video, { scale: 1.35 });
+          el.classList.add("is-ready"); // CSS keeps the hero hidden until this point
 
-          /* ---- intro: plays when the wipe is about half cleared ---- */
+          /* ---- intro: plays straight away (no splash screen); waits for the font, max 0.7s ---- */
           const tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
           tl.to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.inOut" }, 0);
           if (video) tl.to(video, { scale: 1, duration: 1.9 }, 0.1);
           tl.to([...tops, ...bots], { xPercent: 0, autoAlpha: 1, duration: 1.5 }, 0.25) // halves converge
             .to(rise, { yPercent: 0, duration: 1.2 }, 0.6); // orange line rises through its mask
-          const off = onIntro(() => tl.play());
+          let dead = false;
+          const start = () => {
+            const fontReady = document.fonts?.ready ?? Promise.resolve();
+            Promise.race([fontReady, new Promise((r) => setTimeout(r, 700))]).then(() => {
+              if (!dead) tl.play();
+            });
+          };
+          const off = onIntro(start); // fires immediately when no <PageWipe /> is mounted
 
           /* ---- scroll: the two halves of line 1 slide apart ---- */
           const st = () => ({ trigger: el, start: "top top", end: "bottom top", scrub: 0.6 });
@@ -93,7 +100,10 @@ export default function Hero() {
             });
           }
 
-          return () => off();
+          return () => {
+            dead = true;
+            off();
+          };
         }
       );
 
@@ -105,6 +115,9 @@ export default function Hero() {
 
   return (
     <section className="lhero" ref={root} id="top">
+      <noscript>
+        <style>{`.lhero :is(.lhero__title,.lhero__media,.lhero__cta){visibility:visible!important}`}</style>
+      </noscript>
       <div className="lhero__top">
         <h1 className="lhero__title">
           <span className="lhero__line lhero__line--a">

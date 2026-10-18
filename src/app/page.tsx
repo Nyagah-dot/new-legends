@@ -12,7 +12,6 @@ import Pricing from "@/components/Pricing";
 import Location from "@/components/Location";
 import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
-import PageWipe from "@/components/PageWipe";
 import SmoothScroll from "@/components/SmoothScroll";
 import Improv from "@/components/Improv";
 import Directions from "@/components/Directions";
@@ -25,7 +24,6 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <>
-      {/* <PageWipe /> */}
       <SmoothScroll />
       <a href="#main" className="skip">Skip to content</a>
       <Nav />

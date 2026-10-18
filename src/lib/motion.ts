@@ -42,6 +42,12 @@ export function onIntro(cb: () => void): () => void {
     cb();
     return () => {};
   }
+  // No <PageWipe /> mounted (commented out, or a page without one): nothing will ever
+  // fire the intro event, so don't leave the hero / CTAs waiting in their hidden state.
+  if (!document.querySelector(".wipe")) {
+    cb();
+    return () => {};
+  }
   const h = () => cb();
   window.addEventListener(INTRO_EVENT, h, { once: true });
   return () => window.removeEventListener(INTRO_EVENT, h);

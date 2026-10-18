@@ -49,3 +49,8 @@
 /* circle CTA */
 .lhero__cta{position:absolute;z-index:3;right:var(--page-gutter);bottom:clamp(20px,5vw,64px)}
 @media(min-width:1024px){.lhero{--cta:clamp(170px,14vw,240px)}}
+
+/* Pre-hydration: keep the hero hidden until Hero has set its start state  */
+@media(prefers-reduced-motion:no-preference){
+  .lhero:not(.is-ready) :is(.lhero__title,.lhero__media,.lhero__cta){visibility:hidden}
+}
