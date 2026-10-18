@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import CircleCta from "./CircleCta";
+import SectionHeader from "./SectionHeader";
 import { MAPS_URL, WHATSAPP_URL } from "@/lib/site";
 import "./Directions.css";
 
@@ -19,11 +20,57 @@ const FORM_LEAD = "Tell us when you’re coming and we’ll meet you at the door
 const ADDRESS = ["The Legends Fitness", "Links Road, Nyali", "Mombasa, Kenya"];
 const PARKING = "Secure on-site parking.";
 
+/** days use JS numbering: 0 = Sunday … 6 = Saturday. Times are 24h, Nairobi. */
 const HOURS = [
-  { day: "Mon – Fri", time: "5:00 – 22:00" },
-  { day: "Saturday", time: "6:00 – 20:00" },
-  { day: "Sunday", time: "7:00 – 18:00" },
+  { label: "Mon – Fri", days: [1, 2, 3, 4, 5], open: 5, close: 22 },
+  { label: "Saturday", days: [6], open: 6, close: 20 },
+  { label: "Sunday", days: [0], open: 7, close: 18 },
 ] as const;
+
+const hoursText = (h: (typeof HOURS)[number]) => `${h.open}:00 – ${h.close}:00`;
+
+/** Day + minutes since midnight, in Nairobi, whatever the visitor's timezone. */
+function nairobiNow(): { day: number; mins: number } {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Nairobi",
+    weekday: "short",
+    hour: "numeric",
+    minute: "numeric",
+    hourCycle: "h23",
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(get("weekday"));
+  return { day, mins: Number(get("hour")) * 60 + Number(get("minute")) };
+}
+
+function openStatus(now: { day: number; mins: number }): { open: boolean; text: string } {
+  const today = HOURS.find((h) => (h.days as readonly number[]).includes(now.day));
+  if (today && now.mins >= today.open * 60 && now.mins < today.close * 60) {
+    return { open: true, text: `Open now · until ${today.close}:00` };
+  }
+  if (today && now.mins < today.open * 60) return { open: false, text: `Opens today ${today.open}:00` };
+  const next = HOURS.find((h) => (h.days as readonly number[]).includes((now.day + 1) % 7));
+  return { open: false, text: next ? `Closed · opens tomorrow ${next.open}:00` : "Closed" };
+}
+
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+  </svg>
+);
+
+const PinIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const Arrow = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" aria-hidden="true">
+    <path d="M6 18L18 6M8 6h10v10" />
+  </svg>
+);
 
 const DAYS = ["Today", "Tomorrow", "This weekend", "Next week"] as const;
 
@@ -60,8 +107,20 @@ function Word({ children, className = "" }: { children: string; className?: stri
 
 export default function Directions({ onSubmit = sendViaWhatsApp }: Props) {
   const root = useRef<HTMLElement>(null);
-  const [status, setStatus] = useState("");
+  const [formMsg, setFormMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [mapOn, setMapOn] = useState(false);
+  const [now, setNow] = useState<{ day: number; mins: number } | null>(null);
+
+  // client-only (avoids a server/client mismatch); refreshed every minute
+  useEffect(() => {
+    const tick = () => setNow(nairobiNow());
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const status = now ? openStatus(now) : null;
+  const todayIdx = now ? HOURS.findIndex((h) => (h.days as readonly number[]).includes(now.day)) : -1;
 
   useGSAP(
     () => {
@@ -138,9 +197,9 @@ export default function Directions({ onSubmit = sendViaWhatsApp }: Props) {
     setBusy(true);
     try {
       const msg = await onSubmit(data);
-      setStatus(typeof msg === "string" ? msg : "Thanks — we’ll see you soon.");
+      setFormMsg(typeof msg === "string" ? msg : "Thanks — we’ll see you soon.");
     } catch {
-      setStatus("Something went wrong. Please try again, or message us on WhatsApp.");
+      setFormMsg("Something went wrong. Please try again, or message us on WhatsApp.");
     } finally {
       setBusy(false);
     }
@@ -206,7 +265,7 @@ export default function Directions({ onSubmit = sendViaWhatsApp }: Props) {
                 <path d="M6 18L18 6M8 6h10v10" />
               </svg>
             </button>
-            <p className="ldir__status" role="status" aria-live="polite">{status}</p>
+            <p className="ldir__status" role="status" aria-live="polite">{formMsg}</p>
           </form>
         </div>
 
@@ -216,49 +275,94 @@ export default function Directions({ onSubmit = sendViaWhatsApp }: Props) {
         </div>
       </div>
 
-      {/* ------------------------------------------- info: hours + map */}
+      {/* ------------------------------------------- info: address / hours / contact / map */}
       <div className="ldir__info">
-        <div className="ldir__infogrid">
-          <div className="ldir__col" data-info>
-            <span className="ldir__k">Address</span>
-            <address>
-              {ADDRESS.map((l) => (
-                <span key={l}>{l}</span>
-              ))}
-            </address>
-            <p className="ldir__note">{PARKING}</p>
-          </div>
+        <div className="ldir__infowrap">
+          <SectionHeader
+            className="ldir__infohead"
+            eyebrow="Visit us"
+            lines={[{ text: "Where we are" }, { text: "and when we’re open.", accent: true }]}
+            rule
+          />
 
-          <div className="ldir__col" data-info>
-            <span className="ldir__k">Opening hours</span>
-            <ul className="ldir__hours">
-              {HOURS.map((h) => (
-                <li key={h.day}>
-                  <b>{h.day}</b>
-                  <span>{h.time}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <div className="ldir__infogrid">
+            <article className="ldir__card ldir__card--addr" data-info>
+              <span className="ldir__k">Address</span>
+              <h3 className="ldir__big">{ADDRESS[0]}</h3>
+              <address>
+                {ADDRESS.slice(1).map((l) => (
+                  <span key={l}>{l}</span>
+                ))}
+              </address>
+              <p className="ldir__chip">
+                <i aria-hidden="true">P</i>
+                {PARKING}
+              </p>
+            </article>
 
-          <div className="ldir__col" data-info>
-            <span className="ldir__k">Contact</span>
-            <a className="ldir__link" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-              WhatsApp us <span aria-hidden="true">&rarr;</span>
-            </a>
-            <a className="ldir__link" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
-              Open in Google Maps <span aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
+            <article className="ldir__card ldir__card--hours" data-info>
+              <div className="ldir__cardhead">
+                <span className="ldir__k">Opening hours</span>
+                <span className={`ldir__status${status?.open ? " is-open" : ""}`} aria-live="polite">
+                  {status && (
+                    <>
+                      <i aria-hidden="true" />
+                      {status.text}
+                    </>
+                  )}
+                </span>
+              </div>
+              <ul className="ldir__hours">
+                {HOURS.map((h, i) => (
+                  <li key={h.label} className={i === todayIdx ? "is-today" : undefined}>
+                    <b>
+                      {h.label}
+                      {i === todayIdx && <em>Today</em>}
+                    </b>
+                    <span>{hoursText(h)}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
 
-          <div className="ldir__map" data-info>
-            <iframe
-              title="Map: The Legends Fitness, Links Road, Nyali"
-              src={MAP_EMBED}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
+            <article className="ldir__card ldir__card--contact" data-info>
+              <span className="ldir__k">Contact</span>
+              <div className="ldir__rows">
+                <a className="ldir__rowlink" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+                  <span className="ldir__ico"><WhatsAppIcon /></span>
+                  <span className="ldir__lbl">WhatsApp us</span>
+                  <i><Arrow /></i>
+                </a>
+                <a className="ldir__rowlink" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
+                  <span className="ldir__ico"><PinIcon /></span>
+                  <span className="ldir__lbl">Open in Google Maps</span>
+                  <i><Arrow /></i>
+                </a>
+              </div>
+            </article>
+
+            <div className="ldir__map" data-info onMouseLeave={() => setMapOn(false)}>
+              <iframe
+                className={mapOn ? "is-live" : undefined}
+                title="Map: The Legends Fitness, Links Road, Nyali"
+                src={MAP_EMBED}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+              <a className="ldir__maplink" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
+                Open in Maps <Arrow />
+              </a>
+              {mapOn ? (
+                <button type="button" className="ldir__mapbtn ldir__mapbtn--done" onClick={() => setMapOn(false)}>
+                  Done
+                </button>
+              ) : (
+                <button type="button" className="ldir__mapgate" onClick={() => setMapOn(true)} aria-label="Activate map to pan and zoom">
+                  <span className="ldir__mapbtn">Explore map</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
