@@ -7,7 +7,7 @@ import AccountMenu from "./AccountMenu";
 import { TIMETABLE_HREF } from "@/lib/site";
 
 const links = [
-  { href: "/#beginners", label: "Beginners" },
+  // { href: "/#beginners", label: "Beginners" },
   { href: "/#classes", label: "Classes" },
   { href: "/#coaches", label: "Coaches" },
   { href: "/#pricing", label: "Pricing" },
