@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import StatusPill from "@/components/desk/StatusPill";
 import { cleanQuery, lfNo, type MemberRow, type StatusRow } from "@/lib/desk";
 import { fmtLong } from "@/lib/orders";
+import DailyCount from "./DailyCount";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -14,9 +15,10 @@ const FILTERS = [
   { key: "none", label: "No membership" },
 ] as const;
 
-export default async function MembersPage({ searchParams }: { searchParams: Promise<{ filter?: string; q?: string }> }) {
+export default async function MembersPage({ searchParams }: { searchParams: Promise<{ filter?: string; q?: string; day?: string }> }) {
   await requireRole(["staff", "admin"], "/desk/login");
   const sp = await searchParams;
+  const daily = sp.filter === "daily";
   const filter = FILTERS.some((f) => f.key === sp.filter) ? (sp.filter as (typeof FILTERS)[number]["key"]) : "all";
   const q = cleanQuery(sp.q ?? "").toLowerCase();
 
@@ -58,21 +60,26 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <h1>Members</h1>
+      {!daily && (
       <form action="/desk/members" method="get" className="dk-search" role="search">
         <input type="hidden" name="filter" value={filter} />
         <input name="q" type="search" defaultValue={q} placeholder="Filter by name, phone, email or LF-0042" aria-label="Filter members" />
         <button type="submit" className="btn btn-primary">Filter</button>
       </form>
+      )}
 
       <div className="dk-filters">
         {FILTERS.map((f) => (
-          <Link key={f.key} href={href(f.key)} className={filter === f.key ? "on" : undefined}>
+          <Link key={f.key} href={href(f.key)} className={!daily && filter === f.key ? "on" : undefined}>
             {f.label} ({counts[f.key]})
           </Link>
         ))}
+        <Link href="/desk/members?filter=daily" className={daily ? "on" : undefined}>Daily check-ins</Link>
       </div>
 
-      {rows.length === 0 ? (
+      {daily ? (
+        <DailyCount day={sp.day} />
+      ) : rows.length === 0 ? (
         <p className="portal-card">No one matches.</p>
       ) : (
         <div className="dk-scroll">
@@ -100,7 +107,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
           </table>
         </div>
       )}
-      {people.length >= 500 && <p style={{ marginTop: 12, fontSize: ".85rem", color: "var(--steel)" }}>Showing the first 500 people. Use the search above to narrow down.</p>}
+      {!daily && people.length >= 500 && <p style={{ marginTop: 12, fontSize: ".85rem", color: "var(--steel)" }}>Showing the first 500 people. Use the search above to narrow down.</p>}
     </>
   );
 }
