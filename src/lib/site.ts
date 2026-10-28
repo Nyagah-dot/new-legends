@@ -11,3 +11,13 @@ export const SOCIALS: { label: string; href: string }[] = [];
 
 export const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=The+Legends+Fitness+Links+Road+Nyali+Mombasa";
+
+/**
+ * Can clients book a 1-to-1 session online yet? Keep this false until the member booking page
+ * exists (patch 26 turns it on). While false, the "Available this week" section tells visitors
+ * to ask at the front desk instead of showing a button to a page that isn't there.
+ */
+export const ONE_TO_ONE_ONLINE = false;
+
+/** Where the "book a 1-to-1" button goes once online booking is on. */
+export const ONE_TO_ONE_HREF = "/account/trainers";

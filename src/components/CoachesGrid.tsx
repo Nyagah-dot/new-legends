@@ -5,13 +5,18 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { COACHES } from "@/lib/coaches";
+import type { Coach } from "@/lib/coaches";
 import { TIMETABLE_HREF } from "@/lib/site";
 import "./CoachesGrid.css";
+import "./CoachesLive.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-export default function CoachesGrid() {
+/** "Jane Mwangi" -> "JM": shown when a coach has no photo yet. */
+const initials = (name: string) =>
+  name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+
+export default function CoachesGrid({ coaches }: { coaches: Coach[] }) {
   const root = useRef<HTMLElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -63,7 +68,7 @@ export default function CoachesGrid() {
   return (
     <section className="lcg" id="coach-team" ref={root} aria-label="Our coaches">
       <div className="lcg__grid">
-        {COACHES.map((c) => (
+        {coaches.map((c) => (
           <article
             key={c.id}
             className="lcg__card"
@@ -72,7 +77,11 @@ export default function CoachesGrid() {
             onClick={() => tapToggle(c.id)}
           >
             <div className="lcg__media">
-              <img src={c.image} alt={c.alt} loading="lazy" decoding="async" />
+              {c.image ? (
+                <img src={c.image} alt={c.alt} loading="lazy" decoding="async" />
+              ) : (
+                <span className="lcg__noimg" aria-hidden="true">{initials(c.name)}</span>
+              )}
             </div>
 
             {/* resting label, bottom-left */}
@@ -91,25 +100,29 @@ export default function CoachesGrid() {
             <div className="lcg__panel">
               <p className="lcg__panel-role">{c.role}</p>
               <h3 className="lcg__panel-name">{c.name}</h3>
-              <p className="lcg__blurb">{c.blurb}</p>
+              {c.blurb && <p className="lcg__blurb">{c.blurb}</p>}
 
-              <div className="lcg__block">
-                <h4>Areas of expertise</h4>
-                <ul>
-                  {c.expertise.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </div>
+              {c.expertise.length > 0 && (
+                <div className="lcg__block">
+                  <h4>Areas of expertise</h4>
+                  <ul>
+                    {c.expertise.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-              <div className="lcg__block">
-                <h4>Coaching style</h4>
-                <ul>
-                  {c.style.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </div>
+              {c.style.length > 0 && (
+                <div className="lcg__block">
+                  <h4>Coaching style</h4>
+                  <ul>
+                    {c.style.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <Link href={TIMETABLE_HREF} className="lcg__book" onClick={(e) => e.stopPropagation()}>
                 Book a session
