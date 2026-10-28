@@ -1,0 +1,27 @@
+/* Admin: trainers pages, plus the dropdown styling the class form needs */
+.adm-form select,
+.tr-add select,.tr-add input[type=text],.tr-add input[type=time],.tr-add input[type=date]{
+  font:inherit;font-family:var(--font-sans),system-ui,sans-serif;font-size:1rem;font-weight:500;letter-spacing:0;text-transform:none;
+  padding:12px 14px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0;width:100%}
+.adm-form select:focus,.tr-add select:focus,.tr-add input:focus{outline:3px solid var(--red);outline-offset:1px}
+
+.tr-card{background:var(--white);border:2px solid var(--ink);padding:clamp(16px,2.5vw,28px);margin-bottom:24px;max-width:760px}
+.tr-card h2{font-size:1.1rem;margin-bottom:4px}
+.tr-card .tr-sub{color:var(--steel);font-size:.9rem;margin-bottom:12px}
+.tr-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(20,20,20,.15)}
+.tr-row:last-of-type{border-bottom:0}
+.tr-row .d{font-family:var(--font-mono),monospace;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;min-width:64px}
+.tr-row .grow{flex:1;min-width:160px}
+.tr-row .sub{display:block;font-size:.8rem;color:var(--steel)}
+.tr-wins{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tr-win{display:inline-flex;gap:6px;align-items:center;border:1.5px solid var(--ink);padding:3px 3px 3px 10px;font-weight:600;font-size:.9rem;margin:0}
+.tr-win button{border:0;background:transparent;color:var(--red);font-weight:700;cursor:pointer;padding:4px 9px;font-size:1.1rem;line-height:1}
+.tr-win button:hover{background:var(--red);color:#fff}
+.tr-none{color:var(--steel);font-size:.88rem}
+.tr-add{display:grid;gap:14px;margin-top:16px;padding-top:16px;border-top:2px solid var(--ink)}
+.tr-add label.f{display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono),monospace;font-size:.72rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase}
+.tr-add legend{font-family:var(--font-mono),monospace;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.tr-add .hint{font-weight:400;letter-spacing:0;text-transform:none;color:var(--steel);font-size:.8rem}
+.tr-photo{width:72px;height:72px;object-fit:cover;border:2px solid var(--ink);display:block}
+.tr-photo-row{display:flex;gap:14px;align-items:center}

@@ -5,8 +5,10 @@ import { useActionState } from "react";
 import { saveClass } from "@/app/admin/classes/actions";
 import SubmitButton from "@/components/auth/SubmitButton";
 import { DAY_SHORT, inputTime, type ClassRow } from "@/lib/timetable";
+import type { TrainerOption } from "@/lib/trainers";
+import "./trainers.css";
 
-export default function ClassForm({ initial }: { initial?: ClassRow }) {
+export default function ClassForm({ initial, trainers = [] }: { initial?: ClassRow; trainers?: TrainerOption[] }) {
   const [state, action] = useActionState(saveClass, undefined);
   const days = initial?.weekdays ?? [];
 
@@ -46,8 +48,14 @@ export default function ClassForm({ initial }: { initial?: ClassRow }) {
 
       <div className="adm-grid2">
         <label className="f">
-          Coach (optional)
-          <input name="coach_name" type="text" defaultValue={initial?.coach_name ?? ""} />
+          Trainer (optional)
+          <select name="trainer_id" defaultValue={initial?.trainer_id ?? ""}>
+            <option value="">No trainer picked</option>
+            {trainers.map((t) => (
+              <option key={t.id} value={t.id}>{t.full_name}{t.is_active ? "" : " (hidden)"}</option>
+            ))}
+          </select>
+          <span className="hint">Their 1-to-1 times will skip this class.</span>
         </label>
         <label className="f">
           Spaces (optional)
@@ -55,6 +63,12 @@ export default function ClassForm({ initial }: { initial?: ClassRow }) {
           <span className="hint">Leave empty for no limit.</span>
         </label>
       </div>
+
+      <label className="f">
+        Coach name, if not in the trainer list (optional)
+        <input name="coach_name" type="text" defaultValue={initial?.coach_name ?? ""} />
+        <span className="hint">Ignored when a trainer is picked above.</span>
+      </label>
 
       <label className="f">
         Short description (optional)

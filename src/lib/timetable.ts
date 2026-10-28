@@ -13,6 +13,7 @@ export type ClassRow = {
   bookable: boolean;
   ladies_only: boolean;
   is_active: boolean;
+  trainer_id?: string | null;
 };
 
 export type SessionRow = {

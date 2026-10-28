@@ -26,11 +26,13 @@ function parse(formData: FormData) {
   const starts = text(formData, "starts_at");
   const ends = text(formData, "ends_at");
   const capRaw = text(formData, "capacity");
+  const trainerId = text(formData, "trainer_id");
 
   if (name.length < 2) return { error: "Give the class a name." } as const;
   if (days.length === 0) return { error: "Pick at least one day." } as const;
   if (!TIME_RE.test(starts) || !TIME_RE.test(ends)) return { error: "Enter a start and end time." } as const;
   if (ends <= starts) return { error: "The end time must be after the start time." } as const;
+  if (trainerId && !isUuid(trainerId)) return { error: "That trainer wasn't found." } as const;
 
   let capacity: number | null = null;
   if (capRaw !== "") {
@@ -45,6 +47,7 @@ function parse(formData: FormData) {
       name,
       description: text(formData, "description") || null,
       coach_name: text(formData, "coach_name") || null,
+      trainer_id: trainerId || null,
       weekdays: days,
       starts_at: starts,
       ends_at: ends,
@@ -65,15 +68,25 @@ export async function saveClass(_prev: ClassFormState, formData: FormData): Prom
   const supabase = await createClient();
   const id = text(formData, "id");
 
+  // A picked trainer's name is copied into coach_name, so the public timetable keeps showing it.
+  let coachName: string | null = parsed.values.coach_name;
+  if (parsed.values.trainer_id) {
+    const { data: t } = await supabase.from("trainers").select("full_name").eq("id", parsed.values.trainer_id).maybeSingle();
+    const trainer = t as unknown as { full_name: string } | null;
+    if (!trainer) return { error: "That trainer wasn't found." };
+    coachName = trainer.full_name;
+  }
+  const values = { ...parsed.values, coach_name: coachName };
+
   if (id) {
     if (!isUuid(id)) return { error: "Class not found." };
-    const { data, error } = await supabase.from("classes").update(parsed.values).eq("id", id).select("id");
+    const { data, error } = await supabase.from("classes").update(values).eq("id", id).select("id");
     if (error) return { error: "We couldn't save that class. " + error.message };
     if (!data || data.length === 0) return { error: "Class not found, or you don't have permission." };
     const { error: rpcError } = await supabase.rpc("regenerate_future_sessions", { p_class_id: id });
     if (rpcError) return { error: "Saved, but the upcoming dates couldn't be rebuilt: " + rpcError.message };
   } else {
-    const { error } = await supabase.from("classes").insert(parsed.values);
+    const { error } = await supabase.from("classes").insert(values);
     if (error) return { error: "We couldn't create that class. " + error.message };
     const { error: rpcError } = await supabase.rpc("generate_class_sessions", { p_days_ahead: 28 });
     if (rpcError) return { error: "Created, but the upcoming dates couldn't be made: " + rpcError.message };

@@ -24,6 +24,10 @@ export default async function AdminPage() {
           <h2>Classes</h2>
           <p>Add, edit or remove the weekly classes that make up the timetable.</p>
         </Link>
+        <Link href="/admin/trainers">
+          <h2>Trainers</h2>
+          <p>Add trainers, set their weekly hours and time off, and link each class to the trainer who leads it.</p>
+        </Link>
         <Link href="/admin/sessions">
           <h2>Dates</h2>
           <p>Cancel or restore a single day, and create the coming weeks&rsquo; dates.</p>
