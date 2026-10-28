@@ -40,7 +40,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
   const sessions = ((sRes.data ?? []) as unknown as S[]).filter((s) => s.session_date > today || s.starts_at > nowTime);
 
   const ids = sessions.map((s) => s.id);
-  const aRes = ids.length ? await pub.from("visitor_availability").select("session_id, spots, taken").in("session_id", ids) : { data: [] };
+  const aRes = ids.length ? await pub.rpc("visitor_availability", { p_session_ids: ids }) : { data: [] };
   const avail = new Map(((aRes.data ?? []) as unknown as Avail[]).map((a) => [a.session_id, a]));
 
   // If a member with a running membership opens this page, tell them they don't need it.
