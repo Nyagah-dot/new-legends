@@ -48,9 +48,9 @@ export default function ClassForm({ initial, trainers = [] }: { initial?: ClassR
 
       <div className="adm-grid2">
         <label className="f">
-          Trainer (optional)
+          Coach (optional)
           <select name="trainer_id" defaultValue={initial?.trainer_id ?? ""}>
-            <option value="">No trainer picked</option>
+            <option value="">No coach picked</option>
             {trainers.map((t) => (
               <option key={t.id} value={t.id}>{t.full_name}{t.is_active ? "" : " (hidden)"}</option>
             ))}
@@ -65,9 +65,9 @@ export default function ClassForm({ initial, trainers = [] }: { initial?: ClassR
       </div>
 
       <label className="f">
-        Coach name, if not in the trainer list (optional)
+        Coach name, if not in the coaches list (optional)
         <input name="coach_name" type="text" defaultValue={initial?.coach_name ?? ""} />
-        <span className="hint">Ignored when a trainer is picked above.</span>
+        <span className="hint">Ignored when a coach is picked above.</span>
       </label>
 
       <label className="f">

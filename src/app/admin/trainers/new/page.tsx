@@ -5,7 +5,7 @@ export default async function NewTrainerPage() {
   await requireRole(["admin"], "/desk/login?as=admin");
   return (
     <>
-      <h1>Add a trainer</h1>
+      <h1>Add a coach</h1>
       <p className="lead">After you save, you&rsquo;ll set their weekly hours.</p>
       <TrainerForm />
     </>

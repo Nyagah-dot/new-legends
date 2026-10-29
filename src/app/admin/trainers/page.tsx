@@ -30,25 +30,25 @@ export default async function TrainersPage() {
     <>
       <div className="adm-head">
         <div>
-          <h1>Trainers</h1>
-          <p className="lead">Who coaches at the gym, when each trainer works, and what a 1-to-1 session costs.</p>
+          <h1>Coaches</h1>
+          <p className="lead">Who coaches at the gym, when each coach works, and what a 1-to-1 session costs.</p>
         </div>
-        <Link href="/admin/trainers/new" className="btn btn-primary">Add trainer <span className="arrow">&rarr;</span></Link>
+        <Link href="/admin/trainers/new" className="btn btn-primary">Add coach <span className="arrow">&rarr;</span></Link>
       </div>
 
       {loadError && (
         <p className="adm-note err" role="alert">
-          Couldn&rsquo;t load trainers: {loadError.message}. Has the patch 24 SQL been run in Supabase?
+          Couldn&rsquo;t load coaches: {loadError.message}. Has the patch 24 SQL been run in Supabase?
         </p>
       )}
 
       {trainers.length === 0 && !loadError ? (
-        <p className="portal-card">No trainers yet. Add your first one.</p>
+        <p className="portal-card">No coaches yet. Add your first one.</p>
       ) : (
         <div className="adm-scroll">
           <table className="adm-table">
             <thead>
-              <tr><th>Trainer</th><th>1-to-1 session</th><th>Weekly hours</th><th>Classes led</th><th>Status</th><th></th></tr>
+              <tr><th>Coach</th><th>1-to-1 session</th><th>Weekly hours</th><th>Classes led</th><th>Status</th><th></th></tr>
             </thead>
             <tbody>
               {trainers.map((t) => {
@@ -86,7 +86,7 @@ export default async function TrainersPage() {
       )}
 
       <p style={{ marginTop: 16, fontSize: ".9rem", color: "var(--steel)" }}>
-        To say which trainer leads a group class, open the class under Classes and pick the trainer there.
+        To say which coach leads a group class, open the class under Classes and pick the coach there.
       </p>
     </>
   );

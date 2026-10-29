@@ -10,7 +10,7 @@ import { DAY_SHORT, daysLabel, fmtDate, fmtTime, isUuid, nairobiToday } from "@/
 import { TRAINER_COLUMNS, type HoursRow, type TimeOffRow, type TrainerRow } from "@/lib/trainers";
 
 const NOTES: Record<string, { text: string; err?: boolean }> = {
-  created: { text: "Trainer added. Now set their weekly hours below." },
+  created: { text: "Coach added. Now set their weekly hours below." },
   saved: { text: "Saved." },
   hours_added: { text: "Hours added." },
   hours_removed: { text: "Hours removed." },
@@ -44,7 +44,7 @@ export default async function EditTrainerPage({
   ]);
 
   if (tRes.error) {
-    return <p className="adm-note err" role="alert">Couldn&rsquo;t load this trainer: {tRes.error.message}</p>;
+    return <p className="adm-note err" role="alert">Couldn&rsquo;t load this coach: {tRes.error.message}</p>;
   }
   if (!tRes.data) notFound();
 
@@ -62,10 +62,10 @@ export default async function EditTrainerPage({
         <div>
           <h1>{trainer.full_name}</h1>
           <p className="lead">
-            Details, weekly hours and time off. Clients will only be offered times inside the weekly hours, outside the classes this trainer leads and outside time off.
+            Details, weekly hours and time off. Clients will only be offered times inside the weekly hours, outside the classes this coach leads and outside time off.
           </p>
         </div>
-        <Link href="/admin/trainers" className="btn btn-ghost">&larr; All trainers</Link>
+        <Link href="/admin/trainers" className="btn btn-ghost">&larr; All coaches</Link>
       </div>
 
       {note && <p className={`adm-note${note.err ? " err" : ""}`} role="status">{noteText}</p>}
@@ -75,7 +75,7 @@ export default async function EditTrainerPage({
       {/* ---- Weekly hours ---- */}
       <section className="tr-card" aria-labelledby="hours-h">
         <h2 id="hours-h">Weekly hours</h2>
-        <p className="tr-sub">The times this trainer can take 1-to-1 sessions, every week. A day can have more than one window (for example a morning and an evening).</p>
+        <p className="tr-sub">The times this coach can take 1-to-1 sessions, every week. A day can have more than one window (for example a morning and an evening).</p>
 
         {DAY_SHORT.map((label, i) => {
           const wins = hours.filter((h) => h.weekday === i + 1);
@@ -130,7 +130,7 @@ export default async function EditTrainerPage({
       {/* ---- Time off ---- */}
       <section className="tr-card" aria-labelledby="off-h">
         <h2 id="off-h">Time off</h2>
-        <p className="tr-sub">Days or hours this trainer is away (leave, sickness, an appointment). Clients can&rsquo;t book them then.</p>
+        <p className="tr-sub">Days or hours this coach is away (leave, sickness, an appointment). Clients can&rsquo;t book them then.</p>
 
         {timeOff.length === 0 ? (
           <p className="tr-none">No time off coming up.</p>
@@ -182,7 +182,7 @@ export default async function EditTrainerPage({
       {/* ---- Classes led ---- */}
       <section className="tr-card" aria-labelledby="led-h">
         <h2 id="led-h">Classes they lead</h2>
-        <p className="tr-sub">Group classes are blocked out of this trainer&rsquo;s 1-to-1 times. To change this, edit the class under Classes.</p>
+        <p className="tr-sub">Group classes are blocked out of this coach&rsquo;s 1-to-1 times. To change this, edit the class under Classes.</p>
         {led.length === 0 ? (
           <p className="tr-none">None yet.</p>
         ) : (

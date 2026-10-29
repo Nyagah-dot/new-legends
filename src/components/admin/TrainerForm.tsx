@@ -21,7 +21,7 @@ export default function TrainerForm({ initial }: { initial?: TrainerRow }) {
         </label>
         <label className="f">
           Title (optional)
-          <input name="title" type="text" defaultValue={initial?.title ?? ""} placeholder="e.g. Personal Trainer" maxLength={60} />
+          <input name="title" type="text" defaultValue={initial?.title ?? ""} placeholder="e.g. Strength Coach" maxLength={60} />
         </label>
       </div>
 
@@ -77,14 +77,14 @@ export default function TrainerForm({ initial }: { initial?: TrainerRow }) {
       <div className="adm-checks">
         <label className="adm-check">
           <input type="checkbox" name="is_active" defaultChecked={initial?.is_active ?? true} />
-          <span>Active<small>Untick to hide this trainer from clients without deleting them.</small></span>
+          <span>Active<small>Untick to hide this coach from clients without deleting them.</small></span>
         </label>
       </div>
 
       {state?.error && <p className="auth-error" role="alert">{state.error}</p>}
 
       <div className="adm-actions">
-        <SubmitButton>{initial ? "Save changes" : "Add trainer"}</SubmitButton>
+        <SubmitButton>{initial ? "Save changes" : "Add coach"}</SubmitButton>
         <Link href="/admin/trainers" className="btn btn-ghost">Cancel</Link>
       </div>
     </form>

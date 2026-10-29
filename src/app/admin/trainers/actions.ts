@@ -38,7 +38,7 @@ function parse(formData: FormData) {
   const sortRaw = text(formData, "sort_order");
   const sort = sortRaw === "" ? 0 : Number(sortRaw);
 
-  if (name.length < 2 || name.length > 60) return { error: "Enter the trainer's name (2 to 60 characters)." } as const;
+  if (name.length < 2 || name.length > 60) return { error: "Enter the coach's name (2 to 60 characters)." } as const;
   if (title.length > 60) return { error: "The title is too long (60 characters at most)." } as const;
   if (bio.length > 400) return { error: "The short bio is too long (400 characters at most)." } as const;
   if (photo && !PHOTO_RE.test(photo)) {
@@ -78,14 +78,14 @@ export async function saveTrainer(_prev: TrainerFormState, formData: FormData): 
   const id = text(formData, "id");
 
   if (id) {
-    if (!isUuid(id)) return { error: "Trainer not found." };
+    if (!isUuid(id)) return { error: "Coach not found." };
     const { data: before } = await supabase.from("trainers").select("full_name").eq("id", id).maybeSingle();
     const old = before as unknown as { full_name: string } | null;
-    if (!old) return { error: "Trainer not found, or you don't have permission." };
+    if (!old) return { error: "Coach not found, or you don't have permission." };
 
     const { data, error } = await supabase.from("trainers").update(parsed.values).eq("id", id).select("id");
-    if (error) return { error: "We couldn't save that trainer. " + error.message };
-    if (!data || data.length === 0) return { error: "Trainer not found, or you don't have permission." };
+    if (error) return { error: "We couldn't save that coach. " + error.message };
+    if (!data || data.length === 0) return { error: "Coach not found, or you don't have permission." };
 
     // A renamed trainer keeps showing correctly on the classes they lead (same rebuild the class editor does).
     if (old.full_name !== parsed.values.full_name) {
@@ -99,7 +99,7 @@ export async function saveTrainer(_prev: TrainerFormState, formData: FormData): 
   }
 
   const { data, error } = await supabase.from("trainers").insert(parsed.values).select("id").single();
-  if (error || !data) return { error: "We couldn't add that trainer. " + (error?.message ?? "") };
+  if (error || !data) return { error: "We couldn't add that coach. " + (error?.message ?? "") };
   const newId = (data as unknown as { id: string }).id;
   refresh();
   redirect(`/admin/trainers/${newId}?done=created`);
@@ -124,7 +124,7 @@ export async function addHours(formData: FormData) {
   const supabase = await createClient();
   const { data: t } = await supabase.from("trainers").select("slot_minutes").eq("id", id).maybeSingle();
   const trainer = t as unknown as { slot_minutes: number } | null;
-  if (!trainer) back(id, "error", "Trainer not found.");
+  if (!trainer) back(id, "error", "Coach not found.");
   const slot = trainer!.slot_minutes;
   if (minutesOf(ends) - minutesOf(starts) < slot) back(id, "error", `That window is shorter than one ${slot}-minute session.`);
 
