@@ -1,0 +1,24 @@
+/* 1-to-1 booking (member side). Uses the account palette. */
+.pt-note{padding:12px 16px;border-left:4px solid var(--ink);background:var(--white);margin-bottom:20px;font-weight:600}
+.pt-note.err{border-left-color:var(--red);color:var(--red)}
+.pt-h{font-family:var(--font-mono),monospace;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:28px 0 10px}
+.pt-coaches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pt-coaches a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:2px solid var(--ink);background:var(--white);color:var(--ink);text-decoration:none;font-weight:700;font-size:.9rem}
+.pt-coaches a.on{background:var(--ink);color:#fff}
+.pt-coach-meta{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:4px}
+.pt-coach-meta strong{font-size:1.15rem}
+.pt-day{padding:14px 0;border-top:1px solid rgba(20,20,20,.15)}
+.pt-day:first-of-type{border-top:0}
+.pt-date{display:block;font-family:var(--font-mono),monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.pt-times{display:flex;flex-wrap:wrap;gap:8px}
+.pt-times form{margin:0}
+.pt-time{min-width:84px;min-height:44px;padding:0 14px;border:2px solid var(--ink);background:var(--white);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.pt-time:hover,.pt-time:focus-visible{background:var(--red);border-color:var(--red);color:#fff}
+.pt-pill{display:inline-block;font-family:var(--font-mono),monospace;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border:2px solid var(--ink)}
+.pt-pill.good{background:var(--ink);color:#fff}
+.pt-pill.warn{background:var(--red);border-color:var(--red);color:#fff}
+.pt-pill.dim{opacity:.6}
+.pt-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pt-link{display:inline-flex;align-items:center;min-height:44px;font-weight:700;color:var(--red);text-decoration:underline}
+.pt-linkbtn{background:none;border:0;padding:0;min-height:44px;font:inherit;font-size:.85rem;color:var(--steel);text-decoration:underline;cursor:pointer}
+@media (max-width:480px){.pt-time{flex:1 1 calc(33% - 8px)}}
