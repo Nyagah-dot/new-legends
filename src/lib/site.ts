@@ -17,7 +17,7 @@ export const MAPS_URL =
  * exists (patch 26 turns it on). While false, the "Available this week" section tells visitors
  * to ask at the front desk instead of showing a button to a page that isn't there.
  */
-export const ONE_TO_ONE_ONLINE = false;
+export const ONE_TO_ONE_ONLINE = true;
 
 /** Where the "book a 1-to-1" button goes once online booking is on. */
-export const ONE_TO_ONE_HREF = "/account/trainers";
+export const ONE_TO_ONE_HREF = "/login?next=%2Faccount%2Ftrainers";

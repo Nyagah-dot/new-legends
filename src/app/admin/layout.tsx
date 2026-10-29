@@ -17,9 +17,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .select("id", { count: "exact", head: true })
     .eq("status", "payment_claimed");
 
+  const { count: ptCount } = await supabase
+    .from("pt_bookings")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "payment_claimed");
+
   return (
     <PortalShell profile={profile} area="admin">
-      <AdminNav pending={count ?? 0} visitorsPending={visitorCount ?? 0} />
+      <AdminNav pending={count ?? 0} visitorsPending={visitorCount ?? 0} ptPending={ptCount ?? 0} />
       {children}
     </PortalShell>
   );

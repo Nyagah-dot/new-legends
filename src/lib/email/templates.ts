@@ -241,3 +241,43 @@ Renew: ${opts.renewUrl}
 The Legends Fitness · Links Road, Nyali, Mombasa`;
   return { subject: `Your membership ends ${when} — The Legends Fitness`, html, text };
 }
+
+
+/** Sent when the gym accepts a 1-to-1 payment. */
+export function ptBookingConfirmedEmail(opts: {
+  name?: string; coach: string; date: string; startsAt: string; endsAt: string; bookingNo: string; amount: number; siteUrl: string;
+}) {
+  const hello = opts.name ? `Hi ${first(opts.name)},` : "Hi,";
+  const when = `${fmtLong(opts.date)}, ${opts.startsAt}–${opts.endsAt}`;
+  const html = layout(
+    "Your 1-to-1 session is confirmed",
+    `<p style="margin:0 0 12px;line-height:1.5">${esc(hello)}</p>
+<p style="margin:0 0 12px;line-height:1.5">Thank you. We've received your payment of <strong>KES ${opts.amount.toLocaleString("en-KE")}</strong> and your session is confirmed.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px;font-size:15px">
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">Coach</td><td><strong>${esc(opts.coach)}</strong></td></tr>
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">When</td><td><strong>${esc(when)}</strong></td></tr>
+<tr><td style="padding:3px 18px 3px 0;color:#5A5852">Booking</td><td>${esc(opts.bookingNo)}</td></tr></table>
+<ul style="margin:0 0 12px;padding-left:20px;line-height:1.6;font-size:14px">
+<li>Arrive a few minutes early and tell the front desk your name.</li>
+<li>If you are more than 15 minutes late, the session counts as a no show.</li>
+<li>You can cancel online up to 24 hours before the start.</li></ul>
+<p style="margin:0;line-height:1.5;font-size:14px;color:#5A5852">The Legends Fitness is at Links Road, Nyali, Mombasa.</p>`,
+    { label: "View my session", href: opts.siteUrl }
+  );
+  const text = `${hello}
+
+Thank you. We've received your payment of KES ${opts.amount.toLocaleString("en-KE")} and your session is confirmed.
+
+Coach:   ${opts.coach}
+When:    ${when}
+Booking: ${opts.bookingNo}
+
+- Arrive a few minutes early and tell the front desk your name.
+- If you are more than 15 minutes late, the session counts as a no show.
+- You can cancel online up to 24 hours before the start.
+
+View your session: ${opts.siteUrl}
+
+The Legends Fitness · Links Road, Nyali, Mombasa`;
+  return { subject: `Your 1-to-1 is confirmed: ${opts.coach} — The Legends Fitness`, html, text };
+}
