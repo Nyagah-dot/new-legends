@@ -1,89 +1,51 @@
+import BosonMailClient from "@bosonware-ent/bosonmail";
+
 /**
- * Sends email through the BosonMail API. SERVER ONLY.
- *
- * From Bosonware's documentation:
- *  - POST {base}/send-email, "Authorization: Bearer <key>" (the key needs the `email:send` scope).
- *  - Body: to (string or array), subject, and text and/or html. `from` is optional and must equal the
- *    authenticated inbox address, so we never send it: the sender is the inbox behind the key.
- *  - Limits: 20 requests per second per key, and at most 200 recipients per message.
- *  - 200 means sent, but per-recipient results can still include failures. 502 means it failed for everyone.
- *  - 402 means the inbox is out of outbound email credits.
+ * Sends email through the official BosonMail SDK. SERVER ONLY.
  *
  * Everything that sends email goes through this one function, so changing provider later means changing only this file.
+ *  - The key comes from BOSONMAIL_API_KEY (the older name BOSON_MAIL_API_KEY still works, so nothing needs renaming in Railway).
+ *  - The sender is the inbox behind the key. We never set "from".
+ *  - 402 means the inbox is out of outbound email credits.
+ *  - A network error or timeout is not retried, because we can't know if the email left (avoids duplicate emails).
  */
-export const hasEmailEnv = Boolean(process.env.BOSON_MAIL_API_KEY);
+const apiKey = () => process.env.BOSONMAIL_API_KEY || process.env.BOSON_MAIL_API_KEY || "";
+export const hasEmailEnv = Boolean(apiKey());
 
 export type SendFailure = { recipient: string; error: string };
 export type SendResult =
-  | { ok: true; failed: SendFailure[] } // failed = recipients that didn't get it (empty when all delivered)
-  | { ok: false; error: string; code?: string }; // code e.g. "insufficient_credits", "send_failed", "unauthorized"
+  | { ok: true; failed: SendFailure[]; messageId?: string; status?: string } // failed stays empty: the new API reports one result per message
+  | { ok: false; error: string; code?: string }; // code e.g. "insufficient_credits", "unauthorized", "send_failed", "network", "not_configured"
 
-type Body = {
-  success?: boolean;
-  message?: string;
-  code?: string;
-  error?: string | { code?: string; message?: string };
-  data?: { results?: { recipient: string; success: boolean; error?: string }[] };
-};
-
-const DEFAULT_API_URL = "https://webmail.bosonware.com/api/v1";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Errors come in two shapes: { error: { code, message } } and, for 402, { error: "INSUFFICIENT_CREDITS", message, code }. */
-function readError(body: Body, res: Response): { error: string; code?: string } {
-  const nested = body.error && typeof body.error === "object" ? body.error : null;
-  const code = nested?.code ?? body.code;
-  const message = nested?.message ?? body.message ?? (typeof body.error === "string" ? body.error : undefined);
-  return { error: message ?? `Bosonware responded with ${res.status} ${res.statusText}`.trim(), code };
+function codeFor(status: number | undefined): string {
+  if (status === 402) return "insufficient_credits";
+  if (status === 401 || status === 403) return "unauthorized";
+  if (status === undefined) return "network";
+  return "send_failed";
 }
 
-export async function sendEmail(input: {
-  to: string | string[];
-  subject: string;
-  html: string;
-  text: string;
-}): Promise<SendResult> {
-  const key = process.env.BOSON_MAIL_API_KEY;
-  if (!key) return { ok: false, error: "Email isn't configured (BOSON_MAIL_API_KEY).", code: "not_configured" };
-  const base = (process.env.BOSON_MAIL_API_URL || DEFAULT_API_URL).replace(/\/+$/, "");
+export async function sendEmail(input: { to: string | string[]; subject: string; html: string; text: string }): Promise<SendResult> {
+  const key = apiKey();
+  if (!key) return { ok: false, error: "Email isn't configured (BOSONMAIL_API_KEY).", code: "not_configured" };
+
+  const client = new BosonMailClient({
+    apiKey: key,
+    baseUrl: process.env.BOSONMAIL_BASE_URL || undefined, // normally unset: the SDK default is right
+    timeoutMs: 15_000, // never leave a member waiting on a slow mail server
+  });
+  const to = Array.isArray(input.to) ? input.to : [input.to];
 
   for (let attempt = 1; attempt <= 2; attempt++) {
-    let res: Response;
-    try {
-      res = await fetch(`${base}/send-email`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: Array.isArray(input.to) ? input.to : [input.to],
-          subject: input.subject,
-          text: input.text,
-          html: input.html || undefined,
-        }),
-        cache: "no-store",
-        signal: AbortSignal.timeout(15000), // never leave a member waiting on a slow mail server
-      });
-    } catch (e) {
-      // Network error or timeout: we can't know whether it was sent, so we don't retry (avoids duplicate emails).
-      return { ok: false, error: e instanceof Error ? e.message : "Network error while sending email.", code: "network" };
-    }
-
-    const body = (await res.json().catch(() => ({}))) as Body;
-
-    // 502 = "failed for every recipient" (upstream trouble): safe to try once more.
-    if (res.status === 502 && attempt === 1) {
+    const r = await client.sendEmail(to, input.subject, { text: input.text, html: input.html || undefined });
+    if (r.success) return { ok: true, failed: [], messageId: r.messageId ?? r.id, status: r.status };
+    // 502 = upstream trouble before anything was sent: safe to try once more.
+    if (r.statusCode === 502 && attempt === 1) {
       await sleep(800);
       continue;
     }
-
-    if (!res.ok || body.success === false) return { ok: false, ...readError(body, res) };
-
-    const results = body.data?.results ?? [];
-    const failed = results.filter((r) => !r.success).map((r) => ({ recipient: r.recipient, error: r.error ?? "Delivery failed" }));
-    if (results.length > 0 && failed.length === results.length) {
-      return { ok: false, error: failed[0].error, code: "send_failed" };
-    }
-    if (failed.length > 0) console.warn("[email] some recipients did not receive it:", failed);
-    return { ok: true, failed };
+    return { ok: false, error: r.errorMessage ?? "Email could not be sent.", code: codeFor(r.statusCode) };
   }
   return { ok: false, error: "Email could not be sent.", code: "send_failed" };
 }
