@@ -10,12 +10,14 @@ import { createClient } from "@/lib/supabase/server";
 import { fmtDate, fmtTime, isUuid } from "@/lib/timetable";
 import { fmtStamp, kes } from "@/lib/orders";
 import { PT_LABEL, ptNo, type MyPt } from "@/lib/pt";
-import { cancelPtBooking } from "../actions";
+import SubmitButton from "@/components/auth/SubmitButton";
+import { cancelPtBooking, ratePtSession } from "../actions";
 
 export const metadata: Metadata = { title: "Your 1-to-1 session — THE LEGENDS FITNESS" };
 
-export default async function PtBookingPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PtBookingPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; rated?: string }> }) {
   const { id } = await params;
+  const sp = await searchParams;
   if (!isUuid(id)) notFound();
   const profile = await requireRole(["member", "staff", "admin"], "/login");
 
@@ -26,6 +28,8 @@ export default async function PtBookingPage({ params }: { params: Promise<{ id: 
   ]);
   const b = ((mRes.data ?? []) as unknown as MyPt[]).find((x) => x.id === id);
   if (!b) notFound();
+  const { data: rvData } = await supabase.from("pt_reviews").select("rating, comment").eq("booking_id", id).maybeSingle();
+  const review = rvData as unknown as { rating: number; comment: string | null } | null;
   const gs = gRes.data as unknown as { paybill_number: string | null; paybill_account: string | null; pt_hold_minutes: number; pt_cancel_hours: number; pt_grace_minutes: number } | null;
 
   const holdMs = (gs?.pt_hold_minutes ?? 120) * 60000;
@@ -95,6 +99,36 @@ export default async function PtBookingPage({ params }: { params: Promise<{ id: 
 
         {(status === "completed" || status === "no_show") && (
           <div className="pay-state"><strong>{PT_LABEL[status]}.</strong>{b.coach_name} · {when}.</div>
+        )}
+
+        {status === "completed" && (
+          <div className="pt-rate">
+            {sp.error && <p className="auth-error" role="alert">{sp.error}</p>}
+            {review ? (
+              <>
+                <p>{sp.rated ? "Thank you for your feedback!" : "You rated this session."}</p>
+                <p className="pt-given" aria-label={`${review.rating} out of 5 stars`}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</p>
+                {review.comment && <p className="ac-sub">{review.comment}</p>}
+              </>
+            ) : (
+              <form action={ratePtSession}>
+                <input type="hidden" name="booking_id" value={b.id} />
+                <fieldset>
+                  <legend>How was your session with {b.coach_name.split(" ")[0]}?</legend>
+                  <div className="pt-stars">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <span key={n} style={{ display: "contents" }}>
+                        <input type="radio" id={`star${n}`} name="rating" value={n} required />
+                        <label htmlFor={`star${n}`}>{n}★</label>
+                      </span>
+                    ))}
+                  </div>
+                </fieldset>
+                <textarea name="comment" maxLength={500} placeholder="Anything you'd like to tell us? (optional)" aria-label="Optional comment" />
+                <SubmitButton>Send rating <span className="arrow">&rarr;</span></SubmitButton>
+              </form>
+            )}
+          </div>
         )}
 
         {status === "rejected" && (

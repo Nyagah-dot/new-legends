@@ -18,12 +18,14 @@ export default async function TrainersPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   const supabase = await createClient();
 
-  const [cRes, sRes, mRes, gRes] = await Promise.all([
+  const [cRes, sRes, mRes, gRes, rvRes] = await Promise.all([
     supabase.rpc("public_coaches"),
     supabase.rpc("coach_open_slots", { p_days: 14 }),
     supabase.rpc("my_pt_bookings"),
     supabase.from("gym_settings").select("pt_hold_minutes, pt_cancel_hours").maybeSingle(),
+    supabase.from("pt_reviews").select("booking_id"),
   ]);
+  const rated = new Set(((rvRes.data ?? []) as unknown as { booking_id: string }[]).map((r) => r.booking_id));
   const coaches = (cRes.data ?? []) as unknown as PublicCoach[];
   const slots = (sRes.data ?? []) as unknown as OpenSlot[];
   const mine = (mRes.data ?? []) as unknown as MyPt[];
@@ -144,7 +146,10 @@ export default async function TrainersPage({ searchParams }: { searchParams: Pro
                   <strong>{b.coach_name}</strong>
                   <span className="ac-sub" style={{ display: "block" }}>{fmtDate(b.session_date)} · {fmtTime(b.starts_at)} · {ptNo(b.booking_no)}</span>
                 </div>
-                <span className={`pt-pill ${pillClass(b.status)}`}>{PT_LABEL[b.status]}{b.refund_due ? " · refund due" : ""}</span>
+                <div className="pt-actions">
+                  <span className={`pt-pill ${pillClass(b.status)}`}>{PT_LABEL[b.status]}{b.refund_due ? " · refund due" : ""}</span>
+                  {b.status === "completed" && !rated.has(b.id) && <Link className="pt-link" href={`/account/trainers/${b.id}`}>Rate this session</Link>}
+                </div>
               </div>
             ))}
           </div>

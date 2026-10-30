@@ -22,3 +22,14 @@
 .pt-link{display:inline-flex;align-items:center;min-height:44px;font-weight:700;color:var(--red);text-decoration:underline}
 .pt-linkbtn{background:none;border:0;padding:0;min-height:44px;font:inherit;font-size:.85rem;color:var(--steel);text-decoration:underline;cursor:pointer}
 @media (max-width:480px){.pt-time{flex:1 1 calc(33% - 8px)}}
+
+.pt-rate{margin-top:18px;padding-top:16px;border-top:1px solid rgba(20,20,20,.15)}
+.pt-rate legend{font-weight:700;margin-bottom:8px;padding:0}
+.pt-rate fieldset{border:0;padding:0;margin:0 0 12px}
+.pt-stars{display:flex;gap:8px;flex-wrap:wrap}
+.pt-stars input{position:absolute;opacity:0;width:1px;height:1px}
+.pt-stars label{display:inline-flex;align-items:center;justify-content:center;min-width:52px;min-height:48px;border:2px solid var(--ink);background:var(--white);font-weight:800;cursor:pointer}
+.pt-stars input:checked+label{background:var(--ink);color:#fff}
+.pt-stars input:focus-visible+label{outline:3px solid var(--red);outline-offset:2px}
+.pt-rate textarea{width:100%;min-height:84px;padding:10px;border:2px solid var(--ink);font:inherit;margin-bottom:12px}
+.pt-given{font-size:1.4rem;letter-spacing:.1em}

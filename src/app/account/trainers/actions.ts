@@ -92,3 +92,20 @@ export async function cancelPtBooking(formData: FormData) {
   if (error) redirect(`${HOME}?error=${encodeURIComponent(friendly(error, "We couldn't cancel that. Please speak to the front desk."))}`);
   redirect(`${HOME}?done=cancelled`);
 }
+
+/** A client rates a completed session, 1 to 5 stars with an optional comment. */
+export async function ratePtSession(formData: FormData) {
+  const id = text(formData, "booking_id");
+  const rating = Number(text(formData, "rating"));
+  const comment = text(formData, "comment").slice(0, 500);
+  if (!isUuid(id)) redirect(HOME);
+  const back = `${HOME}/${id}`;
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) redirect(`${back}?error=${encodeURIComponent("Please choose 1 to 5 stars.")}`);
+  const profile = await getCurrentProfile();
+  if (!profile) redirect(`/login?next=${encodeURIComponent(back)}`);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("rate_pt_booking", { p_booking_id: id, p_rating: rating, p_comment: comment || null });
+  revalidatePath(HOME);
+  if (error) redirect(`${back}?error=${encodeURIComponent(friendly(error, "We couldn't save your rating. Please try again."))}`);
+  redirect(`${back}?rated=1`);
+}

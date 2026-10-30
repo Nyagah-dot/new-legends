@@ -1,0 +1,13 @@
+/* Coach phone schedule */
+.co-day{margin:0 0 22px}
+.co-date{font-family:var(--font-mono),monospace;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}
+.co-item{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:14px;background:var(--white);border:2px solid var(--ink);margin-bottom:8px}
+.co-item.one{border-left:8px solid var(--red)}
+.co-item.grp{border-left:8px solid var(--ink)}
+.co-item.off{opacity:.6;border-style:dashed}
+.co-item.cancelled strong{text-decoration:line-through}
+.co-time{font-family:var(--font-mono),monospace;font-weight:700;font-size:.85rem}
+.co-sub{display:block;font-size:.85rem;color:var(--steel);margin-top:2px}
+.co-tag{display:inline-block;font-family:var(--font-mono),monospace;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border:2px solid var(--ink);margin-left:6px;vertical-align:middle}
+.co-empty{padding:18px;background:var(--white);border:2px solid var(--ink)}
+@media (max-width:420px){.co-item{grid-template-columns:78px 1fr;padding:12px}}
